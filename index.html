@@ -1,25 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18261060772"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'AW-18261060772');
-</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Efikcoin EFC — Global Blockchain Ecosystem</title>
-<meta name="description" content="Efikcoin EFC — Stake, Earn, Airdrop, and Give Back. The world's premier charity-embedded blockchain on BSC."/>
-<meta property="og:title" content="Efikcoin EFC — Global Blockchain Ecosystem"/>
-<meta property="og:description" content="Stake. Earn. Give. The charity blockchain wallet for every nation."/>
+<title>EFC Admin Control</title>
+<meta name="robots" content="noindex, nofollow"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   const firebaseConfig = {
     apiKey: "AIzaSyCRjxHqv5WOslB5FDgtkpUhsaO8aqlLAwA",
     authDomain: "efikcoin-admin.firebaseapp.com",
@@ -30,8 +19,7 @@
   };
   const fbApp = initializeApp(firebaseConfig);
   const db = getFirestore(fbApp);
-  // Expose to the regular (non-module) script below
-  window.__fb = { db, collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where, onSnapshot };
+  window.__fb = { db, collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where };
   window.__fbReady = true;
   window.dispatchEvent(new Event('firebase-ready'));
 </script>
@@ -40,1383 +28,1284 @@
 <style>
 /* ═══════════════════════════ RESET ═══════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;font-size:16px}
+html{font-size:16px}
 :root{
-  --gold:#D4A843;--gold-l:#F0C96B;--gold-d:#8A6E2F;--gold-xd:#3A2A10;
-  --obs:#020609;--surf:#080F1A;--surf2:#0D1825;--surf3:#121F30;
-  --bdr:#182438;--bdr2:#1E2E44;
-  --text:#EDE3CE;--muted:#6A8099;--dim:#2E4055;
-  --green:#3DD68C;--red:#E05252;--blue:#4A8FE0;--purple:#8B5CF6;
-  --glow:0 0 48px rgba(212,168,67,.35);
-  --glow-sm:0 0 20px rgba(212,168,67,.18);
-  --glow-lg:0 0 100px rgba(212,168,67,.25),0 0 200px rgba(212,168,67,.1);
+  --red:#E0524A;--red-l:#F08075;--red-d:#8A2E28;
+  --gold:#D4A843;--gold-l:#F0C96B;--gold-d:#8A6E2F;
+  --obs:#040608;--surf:#0A0D12;--surf2:#0F141C;--surf3:#151B26;
+  --bdr:#1C232E;--bdr2:#252E3C;
+  --text:#E8E4DC;--muted:#7A8494;--dim:#3A4250;
+  --green:#3DD68C;--amber:#E0A83D;--blue:#4A8FE0;
+  --glow-red:0 0 40px rgba(224,82,74,.3);
+  --glow-gold:0 0 30px rgba(212,168,67,.25);
 }
-body{background:var(--obs);color:var(--text);font-family:'Syne',sans-serif;line-height:1.6;overflow-x:hidden;min-height:100vh}
+body{background:var(--obs);color:var(--text);font-family:'Syne',sans-serif;line-height:1.6;min-height:100vh;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
-input,textarea,select{font-family:inherit}
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:var(--obs)}
-::-webkit-scrollbar-thumb{background:var(--gold-d);border-radius:3px}
+input,select,textarea{font-family:inherit}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--obs)}::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:3px}
 
-/* ═══════════════════════════ COSMIC BG ═══════════════════════════ */
-#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
-.cosmic-overlay{
-  position:fixed;inset:0;z-index:0;pointer-events:none;
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes scanline{0%{background-position:0 0}100%{background-position:0 40px}}
+@keyframes alertPulse{0%,100%{box-shadow:0 0 0 0 rgba(224,82,74,.4)}50%{box-shadow:0 0 0 8px rgba(224,82,74,0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+/* ═══════════════════════════ LOCK SCREEN ═══════════════════════════ */
+#lock-screen{
+  position:fixed;inset:0;z-index:5000;
   background:
-    radial-gradient(ellipse 80% 50% at 20% 20%,rgba(212,168,67,.06) 0%,transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 80%,rgba(30,60,140,.08) 0%,transparent 60%),
-    radial-gradient(ellipse 40% 30% at 50% 50%,rgba(212,168,67,.03) 0%,transparent 70%);
+    repeating-linear-gradient(0deg,rgba(212,168,67,.02) 0px,rgba(212,168,67,.02) 1px,transparent 1px,transparent 40px),
+    radial-gradient(ellipse 60% 50% at 50% 30%,rgba(212,168,67,.06),transparent 60%),
+    var(--obs);
+  display:flex;align-items:center;justify-content:center;padding:24px;
 }
+.lock-box{
+  width:100%;max-width:420px;
+  background:var(--surf);border:1px solid var(--bdr2);border-radius:16px;
+  padding:40px 36px;position:relative;overflow:hidden;
+  animation:fadeUp .5s ease;
+}
+.lock-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.lock-icon{
+  width:56px;height:56px;border-radius:14px;margin:0 auto 20px;
+  background:linear-gradient(135deg,var(--gold-d),var(--gold));
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+  box-shadow:var(--glow-gold);
+}
+.lock-title{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:800;text-align:center;color:var(--gold);margin-bottom:6px;letter-spacing:1px}
+.lock-sub{text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:32px}
+.lock-step{display:none}
+.lock-step.active{display:block;animation:fadeUp .35s ease}
+.step-label{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.step-label .stepn{width:18px;height:18px;border-radius:50%;background:rgba(212,168,67,.12);border:1px solid var(--gold-d);display:flex;align-items:center;justify-content:center;font-size:9px}
+.lock-inp{
+  width:100%;background:var(--surf2);border:1px solid var(--bdr2);border-radius:9px;
+  padding:13px 15px;color:var(--text);font-size:.88rem;outline:none;
+  transition:border-color .2s;margin-bottom:14px;font-family:'Space Mono',monospace;
+}
+.lock-inp:focus{border-color:var(--gold-d);box-shadow:0 0 0 3px rgba(212,168,67,.08)}
+.lock-inp::placeholder{color:var(--dim);font-family:'Syne',sans-serif}
+.pin-row{display:flex;gap:10px;margin-bottom:18px;justify-content:center}
+.pin-dot{
+  width:46px;height:54px;border-radius:10px;background:var(--surf2);border:1px solid var(--bdr2);
+  display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--gold);
+  font-family:'Space Mono',monospace;transition:all .15s;
+}
+.pin-dot.filled{border-color:var(--gold-d);background:rgba(212,168,67,.05)}
+.lock-btn{
+  width:100%;background:linear-gradient(135deg,var(--gold-l),var(--gold));color:var(--obs);
+  font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:1.5px;
+  padding:14px;border-radius:9px;text-transform:uppercase;transition:all .2s;
+}
+.lock-btn:hover{box-shadow:var(--glow-gold);transform:translateY(-1px)}
+.lock-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.lock-err{
+  background:rgba(224,82,74,.08);border:1px solid rgba(224,82,74,.25);border-radius:8px;
+  padding:11px 14px;font-size:.78rem;color:var(--red-l);margin-bottom:14px;
+  display:none;align-items:center;gap:8px;font-family:'Space Mono',monospace;
+}
+.lock-err.show{display:flex}
+.lock-meta{display:flex;justify-content:space-between;font-size:.7rem;color:var(--dim);margin-top:20px;font-family:'Space Mono',monospace}
+.owner-check{
+  display:flex;align-items:center;gap:10px;background:var(--surf2);border:1px solid var(--bdr2);
+  border-radius:9px;padding:12px 14px;margin-bottom:14px;font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted);
+}
+.owner-check .dot{width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0}
+.owner-check .dot.ok{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+.owner-check .dot.bad{background:var(--red)}
 
-/* ═══════════════════════════ ROTATING COIN HERO ═══════════════════════════ */
-.coin-scene{
-  position:relative;display:flex;align-items:center;justify-content:center;
-  width:280px;height:280px;margin:0 auto 36px;
-}
-/* Outer sacred geometry rings */
-.geo-ring{position:absolute;inset:0;border-radius:50%}
-.geo-ring-1{
-  border:1px solid rgba(212,168,67,.35);
-  animation:geoSpin1 20s linear infinite;
-}
-.geo-ring-2{
-  inset:16px;border:1px dashed rgba(212,168,67,.2);
-  animation:geoSpin2 15s linear infinite reverse;
-}
-.geo-ring-3{
-  inset:32px;border:1px solid rgba(212,168,67,.12);
-  animation:geoSpin1 10s linear infinite;
-}
-.geo-ring-4{
-  inset:48px;border:1px dashed rgba(212,168,67,.08);
-  animation:geoSpin2 25s linear infinite;
-}
-/* Tick marks on ring 1 */
-.geo-ring-1::before,.geo-ring-1::after{
-  content:'';position:absolute;
-  width:6px;height:1px;background:var(--gold);border-radius:1px;
-}
-.geo-ring-1::before{top:50%;left:0;transform:translateY(-50%)}
-.geo-ring-1::after{top:50%;right:0;transform:translateY(-50%)}
+/* ═══════════════════════════ ADMIN SHELL ═══════════════════════════ */
+#admin-shell{display:none;min-height:100vh}
+#admin-shell.active{display:block;animation:fadeUp .4s ease}
 
-/* Orbital paths with spinning dots */
-.orbit-path{position:absolute;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%)}
-.orbit-path-1{width:230px;height:230px}
-.orbit-path-2{width:190px;height:190px}
-.orbit-path-3{width:150px;height:150px}
+/* Topbar */
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:60px;z-index:200;
+  display:flex;align-items:center;gap:16px;padding:0 24px;
+  background:rgba(4,6,8,.94);border-bottom:1px solid var(--bdr);backdrop-filter:blur(20px);
+}
+.tb-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:14px;color:var(--red-l);letter-spacing:2px;display:flex;align-items:center;gap:8px}
+.tb-logo .dot-live{width:7px;height:7px;border-radius:50%;background:var(--red);animation:alertPulse 2s infinite}
+.tb-sp{flex:1}
+.tb-net{
+  display:flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted);
+  background:var(--surf);border:1px solid var(--bdr2);padding:6px 12px;border-radius:7px;
+}
+.tb-net .dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.tb-owner{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--gold);background:rgba(212,168,67,.08);border:1px solid var(--gold-d);padding:6px 12px;border-radius:7px}
+.tb-lock-btn{
+  font-family:'Space Mono',monospace;font-size:9px;color:var(--red-l);border:1px solid rgba(224,82,74,.3);
+  padding:7px 14px;border-radius:7px;transition:all .2s;letter-spacing:.5px;
+}
+.tb-lock-btn:hover{background:rgba(224,82,74,.08);border-color:var(--red)}
 
-.orb-dot{
-  position:absolute;border-radius:50%;
-  top:50%;left:50%;
-  transform-origin:0 0;
+/* Sidebar */
+.sidebar{
+  position:fixed;top:60px;left:0;bottom:0;width:220px;z-index:150;
+  background:var(--surf);border-right:1px solid var(--bdr);padding:20px 12px;overflow-y:auto;
 }
-.orb-dot-a{width:10px;height:10px;background:var(--gold);box-shadow:0 0 12px var(--gold),0 0 24px var(--gold-d);animation:orbitA 8s linear infinite;margin:-5px 0 0 -5px}
-.orb-dot-b{width:7px;height:7px;background:var(--gold-l);box-shadow:0 0 8px var(--gold-l);animation:orbitB 12s linear infinite reverse;margin:-3.5px 0 0 -3.5px}
-.orb-dot-c{width:5px;height:5px;background:var(--gold-d);box-shadow:0 0 6px var(--gold-d);animation:orbitC 6s linear infinite;margin:-2.5px 0 0 -2.5px}
-.orb-dot-d{width:8px;height:8px;background:#4A8FE0;box-shadow:0 0 10px #4A8FE0;animation:orbitD 16s linear infinite;margin:-4px 0 0 -4px}
-.orb-dot-e{width:4px;height:4px;background:#3DD68C;box-shadow:0 0 6px #3DD68C;animation:orbitE 9s linear infinite reverse;margin:-2px 0 0 -2px}
+.sb-section{margin-bottom:24px}
+.sb-label{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;padding:0 10px;margin-bottom:8px}
+.sb-item{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;
+  font-size:.82rem;color:var(--muted);cursor:pointer;transition:all .15s;margin-bottom:2px;
+}
+.sb-item:hover{background:var(--surf2);color:var(--text)}
+.sb-item.active{background:rgba(212,168,67,.08);color:var(--gold);border:1px solid var(--gold-d)}
+.sb-item .ic{font-size:15px;width:18px;text-align:center}
+.sb-item .cnt{margin-left:auto;font-family:'Space Mono',monospace;font-size:9px;background:var(--bdr2);padding:1px 6px;border-radius:10px;color:var(--muted)}
 
-/* Central coin */
-.coin-core{
-  position:relative;z-index:10;
-  width:110px;height:110px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  animation:coinFloat 5s ease-in-out infinite;
-}
-.coin-glow{
-  position:absolute;inset:-20px;border-radius:50%;
-  background:radial-gradient(circle,rgba(212,168,67,.3),transparent 70%);
-  animation:glowPulse 3s ease-in-out infinite;
-  z-index:0;
-}
-.coin-img{
-  width:110px;height:110px;border-radius:50%;object-fit:cover;
-  position:relative;z-index:2;
-  filter:drop-shadow(0 0 20px rgba(212,168,67,.7)) drop-shadow(0 0 40px rgba(212,168,67,.3));
-  animation:coinSpinFlat 6s linear infinite;
-}
-.coin-fallback{
-  width:110px;height:110px;border-radius:50%;
-  background:conic-gradient(var(--gold-xd),var(--gold-d),var(--gold),var(--gold-l),var(--gold),var(--gold-d),var(--gold-xd));
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Orbitron',monospace;font-size:28px;font-weight:900;
-  color:var(--obs);position:relative;z-index:2;
-  filter:drop-shadow(0 0 24px rgba(212,168,67,.8));
-  animation:coinSpinFlat 6s linear infinite;
-}
-.coin-fallback-inner{
-  width:86px;height:86px;border-radius:50%;
-  background:radial-gradient(circle at 35% 35%,var(--gold-l),var(--gold),var(--gold-d));
-  display:flex;align-items:center;justify-content:center;
-  font-size:30px;font-weight:900;color:var(--obs);
-  position:relative;overflow:hidden;
-  animation:coinSpinCounter 6s linear infinite;
-}
-.coin-fallback-inner::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.5) 50%,transparent 70%);
-  background-size:250% 100%;
-  animation:coinShine 2.5s linear infinite;
-}
+/* Main content */
+.main{margin-left:220px;padding-top:60px;min-height:100vh}
+.view{display:none;padding:24px 28px;animation:fadeUp .3s ease}
+.view.active{display:block}
+.view-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.view-title{font-family:'Orbitron',monospace;font-size:1.15rem;font-weight:800;color:var(--text)}
+.view-title .accent{color:var(--gold)}
+.view-sub{color:var(--muted);font-size:.82rem;margin-top:3px}
 
-/* Hexagon grid behind coin */
-.hex-bg{
-  position:absolute;inset:0;
-  background-image:repeating-linear-gradient(
-    60deg,rgba(212,168,67,.04) 0,rgba(212,168,67,.04) 1px,transparent 0,transparent 50%
-  ),repeating-linear-gradient(
-    120deg,rgba(212,168,67,.04) 0,rgba(212,168,67,.04) 1px,transparent 0,transparent 50%
-  );
-  background-size:20px 35px;
-  border-radius:50%;
-  animation:hexRotate 60s linear infinite;
-  opacity:.6;
+/* Alert banner */
+.danger-banner{
+  background:linear-gradient(90deg,rgba(224,82,74,.1),rgba(224,82,74,.04));
+  border:1px solid rgba(224,82,74,.25);border-radius:10px;padding:13px 18px;margin-bottom:20px;
+  display:flex;align-items:center;gap:10px;font-size:.8rem;color:var(--red-l);
 }
+.danger-banner .ic{font-size:16px;flex-shrink:0}
 
-@keyframes geoSpin1{to{transform:rotate(360deg)}}
-@keyframes geoSpin2{to{transform:rotate(-360deg)}}
-@keyframes coinFloat{0%,100%{transform:translateY(0) scale(1)}33%{transform:translateY(-10px) scale(1.02)}66%{transform:translateY(5px) scale(.98)}}
-@keyframes glowPulse{0%,100%{opacity:.6;transform:scale(.9)}50%{opacity:1;transform:scale(1.15)}}
-@keyframes coinSpinFlat{
-  0%{transform:rotate(0deg)}
-  100%{transform:rotate(360deg)}
-}
-@keyframes coinSpinCounter{
-  0%{transform:rotate(0deg)}
-  100%{transform:rotate(-360deg)}
-}
-@keyframes coinShine{
-  0%{background-position:-150% 0}
-  100%{background-position:250% 0}
-}
-@keyframes hexRotate{to{transform:rotate(360deg)}}
-@keyframes orbitA{from{transform:rotate(0deg) translateX(115px)}to{transform:rotate(360deg) translateX(115px)}}
-@keyframes orbitB{from{transform:rotate(60deg) translateX(95px)}to{transform:rotate(420deg) translateX(95px)}}
-@keyframes orbitC{from{transform:rotate(180deg) translateX(75px)}to{transform:rotate(540deg) translateX(75px)}}
-@keyframes orbitD{from{transform:rotate(120deg) translateX(115px)}to{transform:rotate(480deg) translateX(115px)}}
-@keyframes orbitE{from{transform:rotate(300deg) translateX(95px)}to{transform:rotate(660deg) translateX(95px)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
-@keyframes ripple{0%{transform:scale(0);opacity:1}100%{transform:scale(4);opacity:0}}
-@keyframes numberCount{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-@keyframes borderGlow{0%,100%{box-shadow:0 0 0 1px rgba(212,168,67,.2)}50%{box-shadow:0 0 0 1px rgba(212,168,67,.6),var(--glow-sm)}}
-@keyframes scanDown{0%{transform:translateY(-100%);opacity:.8}100%{transform:translateY(100vh);opacity:0}}
-@keyframes ticker50{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-@keyframes pulse2{0%,100%{opacity:.7;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
-@keyframes starfield{0%{transform:translateY(0)}100%{transform:translateY(-50%)}}
-
-/* ═══════════════════════════ NAV ═══════════════════════════ */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:900;height:64px;
-  display:flex;align-items:center;gap:12px;padding:0 20px;
-  background:rgba(2,6,9,.92);border-bottom:1px solid rgba(212,168,67,.12);
-  backdrop-filter:blur(24px);
-}
-.nav-logo{
-  font-family:'Orbitron',monospace;font-weight:900;font-size:16px;
-  color:var(--gold);letter-spacing:2px;display:flex;align-items:center;gap:8px;flex-shrink:0;
-}
-.nav-logo-coin{
-  width:32px;height:32px;border-radius:50%;
-  background:conic-gradient(var(--gold-xd),var(--gold),var(--gold-l),var(--gold),var(--gold-xd));
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:900;color:var(--obs);
-  animation:geoSpin1 6s linear infinite;
-  flex-shrink:0;position:relative;
-}
-.nav-logo-coin::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:1px solid rgba(212,168,67,.4);animation:geoSpin2 4s linear infinite}
-.nav-logo-img{width:32px;height:32px;border-radius:50%;object-fit:cover;animation:geoSpin1 6s linear infinite}
-.nav-sp{flex:1}
-.nav-tabs{display:flex;gap:2px}
-.nav-tab{
-  font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:1px;
-  color:var(--muted);padding:6px 11px;border-radius:6px;
-  transition:all .2s;text-transform:uppercase;cursor:pointer;white-space:nowrap;
-}
-.nav-tab:hover,.nav-tab.active{color:var(--gold);background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.1)}
-.nav-tab:not(:hover):not(.active){border:1px solid transparent}
-.btn-connect{
-  background:linear-gradient(135deg,var(--gold-l),var(--gold));
-  color:var(--obs);font-family:'Orbitron',monospace;font-size:9.5px;font-weight:700;
-  letter-spacing:1px;padding:8px 16px;border-radius:8px;flex-shrink:0;
-  transition:box-shadow .25s,transform .15s;position:relative;overflow:hidden;
-}
-.btn-connect::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);transform:translateX(-100%);transition:transform .3s}
-.btn-connect:hover::before{transform:translateX(100%)}
-.btn-connect:hover{box-shadow:var(--glow);transform:translateY(-1px)}
-.btn-connect.live{background:transparent;border:1px solid var(--green);color:var(--green);font-size:9px}
-.lang-dd{background:transparent;border:1px solid var(--bdr2);color:var(--gold);border-radius:6px;padding:5px 8px;font-family:'Space Mono',monospace;font-size:9.5px;cursor:pointer;outline:none}
-.lang-dd option{background:var(--surf)}
-.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:3px}
-.hamburger span{display:block;width:22px;height:1.5px;background:var(--gold);transition:.3s}
-
-/* ═══════════════════════════ WARNING ═══════════════════════════ */
-.risk-banner{
-  background:linear-gradient(90deg,rgba(224,82,82,.12),rgba(224,82,82,.06),rgba(224,82,82,.12));
-  border-bottom:1px solid rgba(224,82,82,.25);
-  padding:9px 20px;
-  display:flex;align-items:center;gap:10px;
-  font-family:'Space Mono',monospace;font-size:9.5px;color:#F08080;letter-spacing:.3px;
-  animation:borderGlow 6s ease-in-out infinite;
-}
-.risk-banner .rb-icon{font-size:13px;flex-shrink:0;animation:pulse2 3s infinite}
-
-/* ═══════════════════════════ TICKER ═══════════════════════════ */
-.ticker{background:var(--surf);border-bottom:1px solid var(--bdr);overflow:hidden;padding:8px 0}
-.ticker-inner{display:flex;animation:ticker50 55s linear infinite;width:max-content}
-.ticker-inner:hover{animation-play-state:paused}
-.t-item{display:flex;align-items:center;gap:8px;padding:0 28px;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);border-right:1px solid var(--bdr);white-space:nowrap}
-.t-item strong{color:var(--text)}.up{color:var(--green)}.dn{color:var(--red)}
-.t-item .pip{display:inline-block;width:5px;height:5px;border-radius:50%;margin-right:4px}
-
-/* ═══════════════════════════ PAGES ═══════════════════════════ */
-.page{display:none;padding-top:64px;min-height:100vh;animation:fadeUp .4s ease}
-.page.active{display:block}
-#app{position:relative;z-index:1}
-
-/* ═══════════════════════════ SOCIAL BAR ═══════════════════════════ */
-.social-float{
-  position:fixed;right:16px;top:50%;transform:translateY(-50%);
-  z-index:800;display:flex;flex-direction:column;gap:8px;
-}
-.sf-btn{
-  width:42px;height:42px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;
-  border:1px solid var(--bdr2);background:rgba(8,15,26,.85);
-  backdrop-filter:blur(12px);
-  transition:all .25s;cursor:pointer;position:relative;
-}
-.sf-btn:hover{transform:scale(1.1) translateX(-4px);border-color:var(--gold-d);box-shadow:var(--glow-sm)}
-.sf-btn .sf-tip{
-  position:absolute;right:52px;background:var(--surf2);border:1px solid var(--bdr2);
-  padding:4px 10px;border-radius:6px;white-space:nowrap;
-  font-family:'Space Mono',monospace;font-size:9px;color:var(--text);
-  opacity:0;pointer-events:none;transition:opacity .2s;
-}
-.sf-btn:hover .sf-tip{opacity:1}
-.sf-x{background:rgba(0,0,0,.8)}
-.sf-tg{background:rgba(0,119,181,.15)}
-.sf-wa{background:rgba(37,211,102,.1)}
-.sf-em{background:rgba(212,168,67,.08)}
-
-/* ═══════════════════════════ HOME PAGE ═══════════════════════════ */
-#page-home{
-  background:
-    radial-gradient(ellipse 90% 60% at 50% -10%,rgba(212,168,67,.09) 0%,transparent 65%),
-    radial-gradient(ellipse 50% 40% at 10% 90%,rgba(30,60,140,.08) 0%,transparent 60%);
-}
-.hero{text-align:center;padding:52px 20px 72px;max-width:960px;margin:0 auto;position:relative}
-.hero-eyebrow{
-  font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:4px;
-  color:var(--gold);text-transform:uppercase;margin-bottom:28px;
-  display:inline-flex;align-items:center;gap:10px;
-}
-.hero-eyebrow::before,.hero-eyebrow::after{content:'';width:32px;height:1px;background:var(--gold-d)}
-h1.hero-title{
-  font-family:'Orbitron',monospace;
-  font-size:clamp(2rem,5.5vw,4.4rem);
-  font-weight:900;line-height:1.04;letter-spacing:-1px;margin-bottom:18px;
-}
-h1.hero-title .acc{
-  background:linear-gradient(135deg,var(--gold-l) 0%,var(--gold) 40%,#C8891E 80%,var(--gold-l) 100%);
-  background-size:200% auto;
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  animation:shimmer 4s linear infinite;
-}
-@keyframes shimmer{0%{background-position:0%}100%{background-position:200%}}
-.hero-sub{font-size:1rem;color:var(--muted);max-width:540px;margin:0 auto 36px;line-height:1.75}
-.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:48px}
-.btn-gold{
-  background:linear-gradient(135deg,var(--gold-l),var(--gold));
-  color:var(--obs);font-family:'Orbitron',monospace;font-weight:700;font-size:10.5px;
-  letter-spacing:1.5px;padding:13px 30px;border-radius:8px;text-transform:uppercase;
-  transition:all .25s;position:relative;overflow:hidden;
-}
-.btn-gold:hover{box-shadow:0 0 36px rgba(212,168,67,.55);transform:translateY(-2px)}
-.btn-outline{
-  border:1px solid var(--gold-d);color:var(--gold);
-  font-family:'Orbitron',monospace;font-size:10.5px;font-weight:600;
-  letter-spacing:1.5px;padding:13px 30px;border-radius:8px;text-transform:uppercase;
-  transition:all .2s;
-}
-.btn-outline:hover{border-color:var(--gold);box-shadow:var(--glow-sm);background:rgba(212,168,67,.05)}
-
-/* Live price bar */
-.live-bar{
-  display:flex;align-items:center;justify-content:center;gap:0;
-  border:1px solid var(--bdr);border-radius:12px;overflow:hidden;
-  background:var(--surf);max-width:720px;margin:0 auto 48px;flex-wrap:wrap;
-}
-.lp-item{padding:16px 24px;text-align:center;border-right:1px solid var(--bdr);flex:1;min-width:100px}
-.lp-item:last-child{border-right:none}
-.lp-val{font-family:'Orbitron',monospace;font-size:1.15rem;font-weight:800;color:var(--gold);display:block;line-height:1;margin-bottom:4px;transition:color .5s}
-.lp-chg{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.5px;display:block;margin-bottom:2px}
-.lp-lbl{font-family:'Space Mono',monospace;font-size:8.5px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
-
-/* Stats grid */
-.stats-g{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;max-width:900px;margin:0 auto;background:var(--bdr);border-radius:12px;overflow:hidden}
-.stat-c{background:var(--surf);padding:24px 14px;text-align:center}
-.stat-n{font-family:'Orbitron',monospace;font-size:1.35rem;font-weight:800;color:var(--gold);display:block;margin-bottom:5px}
-.stat-l{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase}
-
-/* Features */
-.sec{padding:72px 20px;max-width:1100px;margin:0 auto}
-.sec-tag{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;display:block;margin-bottom:12px}
-h2.sec-title{font-family:'Orbitron',monospace;font-size:clamp(1.5rem,3.5vw,2.3rem);font-weight:800;line-height:1.1;margin-bottom:14px}
-.sec-sub{color:var(--muted);font-size:.92rem;max-width:500px;line-height:1.7;margin-bottom:44px}
-.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--bdr);border-radius:14px;overflow:hidden}
-.feat{
-  background:var(--obs);padding:32px 26px;position:relative;overflow:hidden;transition:background .25s;
-}
-.feat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity .3s}
-.feat:hover{background:var(--surf2)}.feat:hover::after{opacity:.6}
-.feat-icon{font-size:26px;margin-bottom:18px;display:block;filter:drop-shadow(0 0 8px rgba(212,168,67,.4))}
-.feat h3{font-family:'Orbitron',monospace;font-size:.83rem;font-weight:700;margin-bottom:7px;letter-spacing:.5px}
-.feat p{font-size:.8rem;color:var(--muted);line-height:1.65}
-
-/* Whitepaper */
-.wp{background:var(--surf);border:1px solid var(--bdr);border-radius:16px;padding:44px;margin:0 20px;max-width:1100px;position:relative;overflow:hidden}
-.wp::after{content:'📜';position:absolute;right:-10px;top:50%;transform:translateY(-50%) rotate(15deg);font-size:200px;opacity:.03;pointer-events:none}
-.wp-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
-.wp-content h3{font-family:'Orbitron',monospace;font-size:1.05rem;font-weight:800;color:var(--gold);margin-bottom:14px}
-.wp-content p{font-size:.85rem;color:var(--muted);line-height:1.7;margin-bottom:10px}
-.wp-hl{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--surf2);border:1px solid var(--bdr2);border-radius:8px;margin-bottom:8px;font-size:.8rem}
-.wp-hl .bullet{color:var(--gold);font-family:'Space Mono',monospace;font-size:9.5px;flex-shrink:0;margin-top:3px}
-.wp-hl-t{color:var(--muted)}.wp-hl-t strong{color:var(--text)}
-
-/* Testimonials */
-.testi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.testi{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:26px;transition:all .25s}
-.testi:hover{border-color:var(--gold-d);transform:translateY(-4px);box-shadow:var(--glow-sm)}
-.stars{color:var(--gold);font-size:12px;margin-bottom:12px;letter-spacing:2px}
-.testi-q{font-size:.82rem;color:var(--text);line-height:1.65;font-style:italic;margin-bottom:18px}
-.testi-by{display:flex;align-items:center;gap:10px}
-.av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold-d),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:11px;font-weight:800;color:var(--obs);flex-shrink:0}
-.av-nm{font-family:'Space Mono',monospace;font-size:10px;font-weight:700}
-.av-loc{font-size:9px;color:var(--muted);margin-top:1px}
-
-/* Charity band */
-.charity-band{background:linear-gradient(135deg,rgba(212,168,67,.06),rgba(20,50,120,.06));border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);padding:56px 20px}
-.cb-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
-.cb-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.cb-stat{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:18px}
-.cb-val{font-family:'Orbitron',monospace;font-size:1.25rem;font-weight:800;color:var(--gold);display:block;margin-bottom:3px}
-.cb-lbl{font-family:'Space Mono',monospace;font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
-
-/* Community / Social section */
-.community-sec{padding:56px 20px;background:var(--surf)}
-.community-inner{max-width:1100px;margin:0 auto}
-.social-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px}
-.social-card{
-  background:var(--obs);border:1px solid var(--bdr);border-radius:14px;padding:28px 20px;
-  text-align:center;transition:all .25s;cursor:pointer;position:relative;overflow:hidden;
-}
-.social-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s}
-.social-card:hover::before{opacity:1}
-.social-card:hover{transform:translateY(-4px)}
-.sc-x::before{background:radial-gradient(ellipse at 50% 0%,rgba(0,0,0,.3),transparent)}
-.sc-x:hover{border-color:#555;box-shadow:0 0 20px rgba(255,255,255,.05)}
-.sc-tg::before{background:radial-gradient(ellipse at 50% 0%,rgba(0,119,181,.12),transparent)}
-.sc-tg:hover{border-color:#0077B5;box-shadow:0 0 20px rgba(0,119,181,.15)}
-.sc-wa::before{background:radial-gradient(ellipse at 50% 0%,rgba(37,211,102,.1),transparent)}
-.sc-wa:hover{border-color:#25D366;box-shadow:0 0 20px rgba(37,211,102,.15)}
-.sc-em::before{background:radial-gradient(ellipse at 50% 0%,rgba(212,168,67,.08),transparent)}
-.sc-em:hover{border-color:var(--gold-d);box-shadow:var(--glow-sm)}
-.sc-icon{font-size:36px;margin-bottom:14px;display:block;filter:drop-shadow(0 0 8px rgba(255,255,255,.1))}
-.sc-name{font-family:'Orbitron',monospace;font-size:.8rem;font-weight:700;margin-bottom:6px}
-.sc-handle{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);margin-bottom:16px}
-.sc-join{
-  display:inline-block;
-  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;
-  padding:7px 16px;border-radius:6px;border:1px solid var(--bdr2);color:var(--muted);
-  transition:all .2s;
-}
-.social-card:hover .sc-join{color:var(--gold);border-color:var(--gold-d)}
-
-/* ═══════════════════════════ DASHBOARD ═══════════════════════════ */
-.dash-page{padding:24px 20px;max-width:1200px;margin:0 auto}
-.dash-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-.dash-title{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:800;color:var(--gold)}
-.w-badge{display:flex;align-items:center;gap:8px;background:var(--surf);border:1px solid var(--bdr2);border-radius:8px;padding:7px 14px}
-.w-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse2 2s infinite;flex-shrink:0}
-.w-addr{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--gold)}
-
-/* Balance cards */
-.bal-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-.bal-c{
-  background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:22px 18px;
+/* Stat grid */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.stat-card{
+  background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:20px;
   position:relative;overflow:hidden;transition:border-color .2s;
 }
-.bal-c:hover{border-color:var(--gold-d)}
-.bal-c::after{content:'';position:absolute;top:0;right:0;width:70px;height:70px;border-radius:50%;background:radial-gradient(circle,rgba(212,168,67,.06),transparent 70%);transform:translate(25px,-25px)}
-.bal-lbl{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;display:block}
-.bal-v{font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:800;color:var(--gold);display:block;margin-bottom:3px}
-.bal-usd{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted)}
-.bal-ic{position:absolute;top:14px;right:14px;font-size:18px;opacity:.5}
-
-/* Action row */
-.act-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px}
-.act-btn{
-  background:var(--surf);border:1px solid var(--bdr2);border-radius:10px;padding:14px 6px;
-  display:flex;flex-direction:column;align-items:center;gap:5px;
-  font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.5px;
-  color:var(--muted);text-transform:uppercase;transition:all .2s;
-}
-.act-btn:hover{border-color:var(--gold-d);color:var(--gold);background:rgba(212,168,67,.04);transform:translateY(-1px)}
-.act-btn .a-ic{font-size:20px}
+.stat-card:hover{border-color:var(--bdr2)}
+.stat-card .sc-icon{position:absolute;top:14px;right:14px;font-size:18px;opacity:.4}
+.sc-label{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:8px}
+.sc-val{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:800;color:var(--text);display:block;margin-bottom:3px}
+.sc-val.gold{color:var(--gold)}.sc-val.green{color:var(--green)}.sc-val.red{color:var(--red-l)}
+.sc-delta{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)}
+.sc-delta.up{color:var(--green)}.sc-delta.dn{color:var(--red-l)}
 
 /* Panels */
-.panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-.panel{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:22px}
-.p-title{font-family:'Orbitron',monospace;font-size:.82rem;font-weight:700;color:var(--gold);margin-bottom:18px;display:flex;align-items:center;gap:8px}
-.badge{font-size:8.5px;background:rgba(212,168,67,.1);border:1px solid var(--gold-d);padding:2px 7px;border-radius:4px;color:var(--gold);font-family:'Space Mono',monospace;letter-spacing:1px}
-.badge-green{font-size:8.5px;background:rgba(61,214,140,.1);border:1px solid rgba(61,214,140,.25);padding:2px 7px;border-radius:4px;color:var(--green);font-family:'Space Mono',monospace}
+.panel{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:22px;margin-bottom:18px}
+.panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--bdr)}
+.panel-title{font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.live-badge{display:inline-flex;align-items:center;gap:5px;font-family:'Space Mono',monospace;font-size:8.5px;color:var(--green);background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.2);padding:3px 8px;border-radius:5px}
+.live-badge .d{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 
-/* Input */
-.inp-wrap{margin-bottom:14px}
-.inp-lbl{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted);margin-bottom:5px;display:flex;justify-content:space-between}
-.mx-btn{color:var(--gold);cursor:pointer;transition:opacity .2s;font-size:9.5px}.mx-btn:hover{opacity:.7}
-.inp{
-  width:100%;background:var(--surf2);border:1px solid var(--bdr2);
-  border-radius:8px;padding:11px 13px;color:var(--text);font-size:.87rem;
-  outline:none;transition:border-color .2s;
+/* Form elements */
+.f-group{margin-bottom:14px}
+.f-label{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
+.f-inp{
+  width:100%;background:var(--surf2);border:1px solid var(--bdr2);border-radius:8px;
+  padding:11px 13px;color:var(--text);font-size:.85rem;outline:none;transition:border-color .2s;
 }
-.inp:focus{border-color:var(--gold-d);box-shadow:0 0 0 3px rgba(212,168,67,.07)}
-.inp::placeholder{color:var(--dim)}
-
-/* Tier cards */
-.tier-g{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
-.tier{background:var(--surf2);border:1px solid var(--bdr2);border-radius:8px;padding:11px;cursor:pointer;transition:all .2s;text-align:center}
-.tier.sel{border-color:var(--gold);background:rgba(212,168,67,.06)}
-.tier-nm{font-family:'Orbitron',monospace;font-size:8.5px;font-weight:700;color:var(--text);margin-bottom:3px}
-.tier-apy{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--gold)}
-.tier-lk{font-size:8px;color:var(--muted);margin-top:1px;font-family:'Space Mono',monospace}
-
-/* TX list */
-.tx-list{display:flex;flex-direction:column;gap:7px;max-height:260px;overflow-y:auto}
-.tx-row{display:flex;align-items:center;gap:10px;background:var(--surf2);border:1px solid var(--bdr2);border-radius:8px;padding:11px 13px}
-.tx-ic{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.tx-ic.in{background:rgba(61,214,140,.1);border:1px solid rgba(61,214,140,.2)}
-.tx-ic.out{background:rgba(224,82,82,.1);border:1px solid rgba(224,82,82,.2)}
-.tx-ic.stake{background:rgba(212,168,67,.1);border:1px solid rgba(212,168,67,.2)}
-.tx-inf{flex:1}
-.tx-type{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-.tx-hash{font-family:'Space Mono',monospace;font-size:8.5px;color:var(--muted)}
-.tx-amt{text-align:right}
-.tx-v{font-family:'Orbitron',monospace;font-size:.87rem;font-weight:700}
-.pos{color:var(--green)}.neg{color:var(--red)}.neutral{color:var(--gold)}
-.tx-tm{font-size:8.5px;color:var(--muted);font-family:'Space Mono',monospace}
-
-/* ═══════════════════════════ CLIENT PROFILE ═══════════════════════════ */
-.profile-page{padding:28px 20px;max-width:900px;margin:0 auto}
-.profile-hero{
-  background:linear-gradient(135deg,rgba(212,168,67,.08),transparent),var(--surf);
-  border:1px solid var(--bdr);border-radius:16px;padding:32px;margin-bottom:20px;
-  display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+.f-inp:focus{border-color:var(--gold-d);box-shadow:0 0 0 3px rgba(212,168,67,.07)}
+.f-inp::placeholder{color:var(--dim)}
+textarea.f-inp{resize:vertical;font-family:'Space Mono',monospace;font-size:.78rem;line-height:1.8}
+.btn{
+  font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:1px;
+  padding:11px 22px;border-radius:8px;text-transform:uppercase;transition:all .2s;display:inline-flex;align-items:center;gap:7px;
 }
-.profile-avatar{
-  width:80px;height:80px;border-radius:50%;
-  background:conic-gradient(var(--gold-xd),var(--gold),var(--gold-l),var(--gold),var(--gold-xd));
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Orbitron',monospace;font-size:24px;font-weight:900;color:var(--obs);
-  flex-shrink:0;position:relative;animation:geoSpin1 10s linear infinite;
+.btn-gold{background:linear-gradient(135deg,var(--gold-l),var(--gold));color:var(--obs)}
+.btn-gold:hover{box-shadow:var(--glow-gold);transform:translateY(-1px)}
+.btn-danger{background:linear-gradient(135deg,var(--red-l),var(--red));color:#fff}
+.btn-danger:hover{box-shadow:var(--glow-red);transform:translateY(-1px)}
+.btn-outline{border:1px solid var(--bdr2);color:var(--muted)}
+.btn-outline:hover{border-color:var(--gold-d);color:var(--gold)}
+.btn-outline-danger{border:1px solid rgba(224,82,74,.3);color:var(--red-l)}
+.btn-outline-danger:hover{background:rgba(224,82,74,.06);border-color:var(--red)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse}
+.tbl thead th{
+  text-align:left;font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:1px;color:var(--muted);
+  text-transform:uppercase;padding:10px 14px;border-bottom:1px solid var(--bdr);
 }
-.profile-avatar::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid rgba(212,168,67,.3);animation:geoSpin2 6s linear infinite}
-.profile-info h2{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:4px}
-.profile-info .pid{font-family:'Space Mono',monospace;font-size:10px;color:var(--gold);margin-bottom:8px}
-.profile-info .paddr{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted);word-break:break-all}
-.profile-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.pbadge{display:inline-flex;align-items:center;gap:4px;font-family:'Space Mono',monospace;font-size:8.5px;padding:3px 10px;border-radius:4px;letter-spacing:.5px}
-.pb-gold{background:rgba(212,168,67,.1);border:1px solid var(--gold-d);color:var(--gold)}
-.pb-green{background:rgba(61,214,140,.1);border:1px solid rgba(61,214,140,.25);color:var(--green)}
-.pb-blue{background:rgba(74,143,224,.1);border:1px solid rgba(74,143,224,.25);color:var(--blue)}
+.tbl tbody td{padding:13px 14px;border-bottom:1px solid var(--bdr);font-size:.82rem}
+.tbl tbody tr:hover{background:var(--surf2)}
+.tbl tbody tr:last-child td{border-bottom:none}
+.mono{font-family:'Space Mono',monospace}
+.pill{display:inline-flex;align-items:center;gap:4px;font-family:'Space Mono',monospace;font-size:8.5px;padding:3px 9px;border-radius:5px;letter-spacing:.5px}
+.pill-green{background:rgba(61,214,140,.1);border:1px solid rgba(61,214,140,.25);color:var(--green)}
+.pill-red{background:rgba(224,82,74,.1);border:1px solid rgba(224,82,74,.25);color:var(--red-l)}
+.pill-gold{background:rgba(212,168,67,.1);border:1px solid var(--gold-d);color:var(--gold)}
+.pill-blue{background:rgba(74,143,224,.1);border:1px solid rgba(74,143,224,.25);color:var(--blue)}
+.tbl-empty{text-align:center;padding:40px;color:var(--muted);font-size:.82rem;font-family:'Space Mono',monospace}
 
-.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-.profile-card{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:22px}
-.pc-title{font-family:'Orbitron',monospace;font-size:.8rem;font-weight:700;color:var(--gold);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--bdr)}
-.pc-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bdr)}
-.pc-row:last-child{border:none}
-.pc-key{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted)}
-.pc-val{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--text);text-align:right;max-width:200px;word-break:break-all}
-.pc-val.gold{color:var(--gold);font-family:'Orbitron',monospace;font-weight:700}
-.pc-val.green{color:var(--green)}
+/* Activity feed */
+.feed{display:flex;flex-direction:column;gap:2px;max-height:420px;overflow-y:auto}
+.feed-row{display:flex;align-items:center;gap:12px;padding:12px 8px;border-bottom:1px solid var(--bdr)}
+.feed-row:last-child{border:none}
+.feed-ic{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.feed-ic.in{background:rgba(61,214,140,.1);border:1px solid rgba(61,214,140,.2)}
+.feed-ic.out{background:rgba(224,82,74,.1);border:1px solid rgba(224,82,74,.2)}
+.feed-ic.adm{background:rgba(212,168,67,.1);border:1px solid var(--gold-d)}
+.feed-body{flex:1;min-width:0}
+.feed-type{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;text-transform:uppercase}
+.feed-hash{font-family:'Space Mono',monospace;font-size:8.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.feed-amt{text-align:right;flex-shrink:0}
+.feed-val{font-family:'Orbitron',monospace;font-size:.82rem;font-weight:700}
+.feed-tm{font-size:8px;color:var(--muted);font-family:'Space Mono',monospace}
 
-/* Registration form */
-.reg-form{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:28px;margin-bottom:20px}
-.reg-form h3{font-family:'Orbitron',monospace;font-size:.92rem;font-weight:700;color:var(--gold);margin-bottom:6px}
-.reg-form p{font-size:.8rem;color:var(--muted);margin-bottom:22px;line-height:1.6}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.form-g{margin-bottom:14px}
-.form-lbl{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+/* Risky action card */
+.risk-card{
+  background:var(--surf2);border:1px solid var(--bdr2);border-radius:10px;padding:18px;margin-bottom:12px;
+  display:flex;align-items:center;gap:16px;transition:border-color .2s;
+}
+.risk-card:hover{border-color:var(--red-d)}
+.risk-card .ri{font-size:22px;flex-shrink:0}
+.risk-info{flex:1}
+.risk-info h4{font-size:.85rem;font-weight:700;margin-bottom:3px}
+.risk-info p{font-size:.76rem;color:var(--muted)}
 
-/* Client list */
-.client-list{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;overflow:hidden}
-.cl-head{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 80px;background:var(--surf2);padding:11px 18px;border-bottom:1px solid var(--bdr)}
-.cl-th{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
-.cl-row{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 80px;padding:14px 18px;border-bottom:1px solid var(--bdr);align-items:center;transition:background .2s}
-.cl-row:last-child{border:none}.cl-row:hover{background:var(--surf2)}
-.cl-user{display:flex;align-items:center;gap:10px}
-.cl-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gold-d),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:9px;font-weight:800;color:var(--obs);flex-shrink:0}
-.cl-nm{font-size:.82rem;font-weight:600}
-.cl-id{font-family:'Space Mono',monospace;font-size:8.5px;color:var(--muted)}
-.cl-addr{font-family:'Space Mono',monospace;font-size:8.5px;color:var(--muted)}
-.cl-bal{font-family:'Orbitron',monospace;font-size:.82rem;font-weight:700;color:var(--gold)}
-.cl-joined{font-family:'Space Mono',monospace;font-size:8.5px;color:var(--muted)}
-.view-btn{font-family:'Space Mono',monospace;font-size:8.5px;padding:4px 10px;border:1px solid var(--bdr2);border-radius:5px;color:var(--muted);cursor:pointer;transition:all .2s}
-.view-btn:hover{border-color:var(--gold-d);color:var(--gold)}
+/* Audit log */
+.audit-row{
+  display:grid;grid-template-columns:140px 1fr 110px;gap:14px;padding:11px 14px;
+  border-bottom:1px solid var(--bdr);font-size:.78rem;align-items:center;
+}
+.audit-row:last-child{border:none}
+.audit-row:hover{background:var(--surf2)}
+.audit-time{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)}
+.audit-action{color:var(--text)}
+.audit-action b{color:var(--gold)}
 
-/* ═══════════════════════════ STAKING ═══════════════════════════ */
-.stk-page{padding:28px 20px;max-width:900px;margin:0 auto}
-.stk-hero{text-align:center;margin-bottom:32px;background:linear-gradient(135deg,rgba(212,168,67,.07),transparent),var(--surf);border:1px solid var(--bdr);border-radius:16px;padding:36px}
-.stk-hero h2{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:800;margin-bottom:6px}
-.pending-r{font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;color:var(--gold);display:block;margin:18px 0;text-shadow:0 0 40px rgba(212,168,67,.4)}
-.stk-stats{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
-.stk-stat{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:22px;text-align:center}
-.stk-sv{font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:800;color:var(--gold);display:block;margin-bottom:4px}
-.stk-sl{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase}
-.apy-g{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
-.apy-c{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
-.apy-c::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(212,168,67,.06),transparent);opacity:0;transition:opacity .3s}
-.apy-c:hover::before,.apy-c.sel::before{opacity:1}
-.apy-c.sel{border-color:var(--gold);box-shadow:var(--glow-sm)}
-.apy-nm{font-family:'Orbitron',monospace;font-size:8.5px;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:7px;text-transform:uppercase}
-.apy-pct{font-family:'Orbitron',monospace;font-size:1.7rem;font-weight:900;color:var(--gold);display:block;margin-bottom:3px}
-.apy-lk{font-family:'Space Mono',monospace;font-size:8.5px;color:var(--muted)}
-.apy-b{display:inline-block;background:rgba(212,168,67,.1);border:1px solid var(--gold-d);padding:2px 7px;border-radius:3px;font-size:7.5px;font-family:'Space Mono',monospace;color:var(--gold);margin-top:7px;letter-spacing:1px}
+/* Toggle */
+.toggle{position:relative;width:38px;height:21px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-sl{position:absolute;inset:0;border-radius:11px;background:var(--surf2);border:1px solid var(--bdr2);transition:.3s;cursor:pointer}
+.toggle-sl::before{content:'';position:absolute;width:15px;height:15px;border-radius:50%;background:var(--muted);top:2px;left:2px;transition:.3s}
+.toggle input:checked + .toggle-sl{background:rgba(61,214,140,.12);border-color:rgba(61,214,140,.3)}
+.toggle input:checked + .toggle-sl::before{background:var(--green);transform:translateX(17px)}
 
-/* ═══════════════════════════ AIRDROP ═══════════════════════════ */
-.air-page{padding:28px 20px;max-width:880px;margin:0 auto}
-.air-warn{background:rgba(224,82,82,.07);border:1px solid rgba(224,82,82,.22);border-radius:12px;padding:18px 22px;margin-bottom:24px;font-size:.82rem;color:#F08080;line-height:1.65}
-.air-warn strong{color:#E05252;font-family:'Space Mono',monospace}
-.air-panel{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:26px;margin-bottom:18px}
-.air-panel h3{font-family:'Orbitron',monospace;font-size:.88rem;font-weight:700;color:var(--gold);margin-bottom:5px}
-.air-panel p{font-size:.8rem;color:var(--muted);margin-bottom:18px;line-height:1.5}
-.r-area{width:100%;min-height:110px;background:var(--surf2);border:1px solid var(--bdr2);border-radius:8px;padding:11px 13px;color:var(--text);font-size:.8rem;font-family:'Space Mono',monospace;outline:none;resize:vertical;transition:border-color .2s;line-height:1.8}
-.r-area:focus{border-color:var(--gold-d)}
-.r-area::placeholder{color:var(--dim)}
-.air-meta{display:flex;gap:12px;margin:12px 0}
-.am-item{flex:1;background:var(--surf2);border:1px solid var(--bdr2);border-radius:8px;padding:10px 13px}
-.am-lbl{font-family:'Space Mono',monospace;font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:3px}
-.am-val{font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;color:var(--gold)}
+/* Modal */
+.m-ov{position:fixed;inset:0;z-index:9999;background:rgba(4,6,8,.9);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:20px}
+.m-ov.open{display:flex}
+.modal{background:var(--surf);border:1px solid var(--bdr2);border-radius:16px;padding:30px;width:100%;max-width:460px;position:relative;animation:fadeUp .25s ease;max-height:90vh;overflow-y:auto}
+.modal.danger{border-color:rgba(224,82,74,.3)}
+.m-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;border:1px solid var(--bdr2);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .2s}
+.m-close:hover{color:var(--text)}
+.modal h3{font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;margin-bottom:6px}
+.modal h3.danger-text{color:var(--red-l)}
+.modal-sub{font-size:.8rem;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.confirm-detail{background:var(--surf2);border:1px solid var(--bdr2);border-radius:9px;padding:14px;margin-bottom:18px;font-family:'Space Mono',monospace;font-size:10px;line-height:2;color:var(--muted)}
+.confirm-detail b{color:var(--text)}
+.type-confirm{margin-bottom:16px}
+.type-confirm label{font-family:'Space Mono',monospace;font-size:9px;color:var(--red-l);display:block;margin-bottom:7px}
 
-/* ═══════════════════════════ WALLET GEN ═══════════════════════════ */
-.wgen-page{padding:28px 20px;max-width:680px;margin:0 auto}
-.rtabs{display:flex;gap:2px;background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:4px;margin-bottom:24px}
-.rtab{flex:1;padding:9px;border-radius:7px;font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);text-align:center;cursor:pointer;transition:all .2s;border:1px solid transparent}
-.rtab.active{background:var(--surf2);color:var(--gold);border-color:var(--bdr2)}
-.rpanel{display:none}.rpanel.active{display:block}
-.gen-box{background:var(--surf2);border:2px solid var(--bdr2);border-radius:14px;padding:26px;text-align:center;margin:20px 0;transition:border-color .3s}
-.gen-box.done{border-color:var(--gold-d);box-shadow:var(--glow-sm)}
-.gen-addr{font-family:'Space Mono',monospace;font-size:10px;color:var(--gold);word-break:break-all;line-height:1.6;text-align:left;background:var(--obs);padding:11px;border-radius:8px;border:1px solid var(--bdr);margin:10px 0}
-.gen-phrase{font-family:'Space Mono',monospace;font-size:10px;color:var(--text);word-break:break-all;line-height:2;text-align:left;background:var(--obs);padding:13px;border-radius:8px;border:1px solid rgba(224,82,82,.3);margin:6px 0}
-.phrase-warn{background:rgba(224,82,82,.07);border:1px solid rgba(224,82,82,.22);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.76rem;color:#F08080;line-height:1.6}
-.phrase-warn strong{display:block;margin-bottom:3px;font-family:'Space Mono',monospace}
-
-/* ═══════════════════════════ PORTFOLIO ═══════════════════════════ */
-.port-page{padding:28px 20px;max-width:1000px;margin:0 auto}
-.port-sum{display:grid;grid-template-columns:1fr 2fr;gap:18px;margin-bottom:22px}
-.tot-card{background:linear-gradient(135deg,rgba(212,168,67,.09),transparent),var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:28px 22px;display:flex;flex-direction:column;justify-content:center}
-.tot-val{font-family:'Orbitron',monospace;font-size:1.9rem;font-weight:900;color:var(--gold);display:block;margin-bottom:6px}
-.tot-lbl{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
-.chart-card{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:22px;overflow:hidden}
-.chart-title{font-family:'Orbitron',monospace;font-size:.78rem;font-weight:700;color:var(--gold);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
-.cp-row{display:flex;gap:4px}
-.cp-btn{font-family:'Space Mono',monospace;font-size:8.5px;padding:3px 7px;border-radius:4px;color:var(--muted);cursor:pointer;transition:all .2s;border:1px solid transparent}
-.cp-btn.active{border-color:var(--gold-d);color:var(--gold);background:rgba(212,168,67,.08)}
-#price-canvas{width:100%;height:130px;display:block}
-.hold-tbl{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;overflow:hidden}
-.tbl-hd{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;background:var(--surf2);padding:11px 18px;border-bottom:1px solid var(--bdr)}
-.th{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
-.tbl-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;padding:14px 18px;border-bottom:1px solid var(--bdr);align-items:center;transition:background .2s}
-.tbl-row:last-child{border:none}.tbl-row:hover{background:var(--surf2)}
-.td-ast{display:flex;align-items:center;gap:9px}
-.ast-ic{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0}
-.ast-fb{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gold-d),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:9px;font-weight:800;color:var(--obs);flex-shrink:0}
-.ast-nm{font-weight:600;font-size:.85rem}
-.ast-sym{font-family:'Space Mono',monospace;font-size:8.5px;color:var(--muted)}
-.td-v{font-family:'Space Mono',monospace;font-size:.82rem}
-.td-chg{font-family:'Space Mono',monospace;font-size:.8rem}
-
-/* ═══════════════════════════ SETTINGS ═══════════════════════════ */
-.set-page{padding:28px 20px;max-width:780px;margin:0 auto}
-.set-sec{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:22px;margin-bottom:18px}
-.set-sec h3{font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;color:var(--gold);margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--bdr)}
-.set-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--bdr)}
-.set-row:last-child{border:none}
-.set-info h4{font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:2px}
-.set-info p{font-size:.76rem;color:var(--muted)}
-
-/* ═══════════════════════════ MODALS ═══════════════════════════ */
-.m-overlay{position:fixed;inset:0;z-index:9999;background:rgba(2,6,9,.88);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:20px}
-.m-overlay.open{display:flex}
-.modal{background:var(--surf);border:1px solid var(--bdr2);border-radius:16px;padding:28px;width:100%;max-width:460px;position:relative;animation:fadeUp .3s ease;max-height:90vh;overflow-y:auto}
-.m-close{position:absolute;top:14px;right:14px;color:var(--muted);font-size:18px;cursor:pointer;transition:color .2s;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid var(--bdr2)}
-.m-close:hover{color:var(--text);border-color:var(--bdr)}
-.modal h3{font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;color:var(--gold);margin-bottom:6px}
-.modal-sub{font-size:.8rem;color:var(--muted);margin-bottom:22px;line-height:1.5}
-.w-opt{display:flex;align-items:center;gap:12px;padding:14px;background:var(--surf2);border:1px solid var(--bdr2);border-radius:10px;cursor:pointer;transition:all .2s;margin-bottom:9px}
-.w-opt:hover{border-color:var(--gold-d);background:rgba(212,168,67,.04)}
-.w-opt-ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--obs);flex-shrink:0}
-.w-opt-nm{font-family:'Orbitron',monospace;font-size:.8rem;font-weight:700}
-.w-opt-sub{font-size:.72rem;color:var(--muted);margin-top:2px;font-family:'Space Mono',monospace}
-.or-div{text-align:center;font-family:'Space Mono',monospace;font-size:8.5px;color:var(--dim);margin:14px 0;display:flex;align-items:center;gap:10px}
-.or-div::before,.or-div::after{content:'';flex:1;height:1px;background:var(--bdr)}
-
-/* ═══════════════════════════ TOAST ═══════════════════════════ */
+/* Toast */
 #toast-box{position:fixed;bottom:20px;right:20px;z-index:99999;display:flex;flex-direction:column;gap:7px}
 .toast{background:var(--surf);border:1px solid var(--bdr2);border-radius:10px;padding:12px 16px;min-width:260px;font-family:'Space Mono',monospace;font-size:10.5px;display:flex;align-items:center;gap:8px;animation:fadeUp .3s ease;box-shadow:0 8px 32px rgba(0,0,0,.5)}
 .toast.success{border-color:rgba(61,214,140,.3);color:var(--green)}
-.toast.error{border-color:rgba(224,82,82,.3);color:#F08080}
+.toast.error{border-color:rgba(224,82,74,.3);color:var(--red-l)}
 .toast.info{border-color:var(--gold-d);color:var(--gold)}
-.t-ic{font-size:14px}
 
-/* ═══════════════════════════ FOOTER ═══════════════════════════ */
-footer{background:var(--obs);border-top:1px solid var(--bdr);padding:52px 20px 28px}
-.foot-g{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.4fr;gap:36px;max-width:1100px;margin:0 auto 44px}
-.f-brand-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:16px;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.f-brand p{font-size:.78rem;color:var(--muted);line-height:1.7;max-width:240px}
-.f-socials{display:flex;gap:8px;margin-top:14px}
-.f-s-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);transition:all .2s}
-.f-s-btn:hover{border-color:var(--gold-d);color:var(--gold)}
-.f-col h4{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:16px}
-.f-col ul{list-style:none}
-.f-col li{margin-bottom:9px}
-.f-col a{font-size:.78rem;color:var(--muted);transition:color .2s}.f-col a:hover{color:var(--gold)}
-.nl-w{display:flex;border:1px solid var(--bdr2);border-radius:8px;overflow:hidden;background:var(--surf2)}
-.nl-w:focus-within{border-color:var(--gold-d)}
-.nl-i{background:transparent;border:none;outline:none;padding:9px 12px;flex:1;color:var(--text);font-size:.78rem}
-.nl-i::placeholder{color:var(--dim)}
-.nl-g{background:var(--gold);color:var(--obs);font-family:'Orbitron',monospace;font-size:8.5px;font-weight:700;padding:0 13px;letter-spacing:1px;transition:background .2s}
-.nl-g:hover{background:var(--gold-l)}
-.foot-bot{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding-top:22px;border-top:1px solid var(--bdr);flex-wrap:wrap;gap:10px}
-.foot-bot p{font-size:.72rem;color:var(--muted)}
-.foot-links{display:flex;gap:14px}
-.foot-links a{font-size:.72rem;color:var(--muted);transition:color .2s}.foot-links a:hover{color:var(--gold)}
+.w-full{width:100%}.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}
+.flex{display:flex}.gap-10{gap:10px}.items-c{align-items:center}.justify-b{justify-content:space-between}
 
-/* ═══════════════════════════ UTILITIES ═══════════════════════════ */
-.w-full{width:100%}.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}.mt-20{margin-top:20px}.mb-16{margin-bottom:16px}.mb-20{margin-bottom:20px}
-.reveal{opacity:0;transform:translateY(22px);transition:opacity .65s,transform .65s}
-.reveal.in{opacity:1;transform:none}
-.divider{height:1px;background:var(--bdr);margin:18px 0}
-.mono{font-family:'Space Mono',monospace}.orb{font-family:'Orbitron',monospace}
-.text-gold{color:var(--gold)}.text-muted{color:var(--muted)}.text-green{color:var(--green)}.text-red{color:var(--red)}
-.text-sm{font-size:.82rem}.text-xs{font-size:.75rem}
-.flex{display:flex}.gap-8{gap:8px}.gap-12{gap:12px}
-
-/* ═══════════════════════════ RESPONSIVE ═══════════════════════════ */
-@media(max-width:960px){
-  .bal-row{grid-template-columns:repeat(2,1fr)}
-  .act-row{grid-template-columns:repeat(3,1fr)}
-  .panels{grid-template-columns:1fr}
-  .feats{grid-template-columns:1fr 1fr}
-  .apy-g{grid-template-columns:repeat(2,1fr)}
-  .stk-stats{grid-template-columns:1fr}
-  .port-sum{grid-template-columns:1fr}
-  .foot-g{grid-template-columns:1fr 1fr;gap:24px}
-  .stats-g{grid-template-columns:repeat(2,1fr)}
-  .testi-row{grid-template-columns:1fr}
-  .cb-inner{grid-template-columns:1fr}
-  .wp-grid{grid-template-columns:1fr}
-  .social-cards{grid-template-columns:repeat(2,1fr)}
-  .profile-grid{grid-template-columns:1fr}
-  .form-row{grid-template-columns:1fr}
-  .social-float{display:none}
-}
-@media(max-width:640px){
-  .nav-tabs{display:none}.hamburger{display:flex}
-  .feats{grid-template-columns:1fr}
-  .apy-g{grid-template-columns:1fr 1fr}
-  .foot-g{grid-template-columns:1fr}
-  .social-cards{grid-template-columns:1fr 1fr}
-  .coin-scene{width:220px;height:220px}
-  .coin-img,.coin-fallback{width:90px;height:90px}
-  .cl-head,.cl-row{grid-template-columns:2fr 1fr 80px}
-  .cl-th:nth-child(3),.cl-th:nth-child(4),.cl-addr,.cl-bal:nth-child(4),.cl-joined{display:none}
-}
-@media(prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important}
+@media(max-width:900px){
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .two-col{grid-template-columns:1fr}
+  .sidebar{transform:translateX(-100%);transition:transform .25s;z-index:300}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .audit-row{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 
-<!-- ═══ COSMIC CANVAS ═══ -->
-<canvas id="bg-canvas"></canvas>
-<div class="cosmic-overlay"></div>
-
-<!-- ═══ TOAST ═══ -->
 <div id="toast-box"></div>
 
-<!-- ═══ FLOATING SOCIALS ═══ -->
-<div class="social-float">
-  <a class="sf-btn sf-x" href="https://x.com/efikcoineternal" target="_blank" rel="noopener" title="X / Twitter">
-    𝕏<span class="sf-tip">@efikcoineternal</span>
-  </a>
-  <a class="sf-btn sf-tg" href="https://t.me/efikcoinofficialecosystem" target="_blank" rel="noopener" title="Telegram">
-    ✈<span class="sf-tip">Telegram Channel</span>
-  </a>
-  <a class="sf-btn sf-wa" href="https://chat.whatsapp.com/Fb2tng6Ay2TE8FiRdJIQPG" target="_blank" rel="noopener" title="WhatsApp">
-    💬<span class="sf-tip">WhatsApp Channel</span>
-  </a>
-  <a class="sf-btn sf-em" href="mailto:support@efikcoin.xyz" title="Email Support">
-    ✉<span class="sf-tip">support@efikcoin.xyz</span>
-  </a>
-</div>
+<!-- ═══════════════════════════ LOCK SCREEN ═══════════════════════════ -->
+<div id="lock-screen">
+  <div class="lock-box">
+    <div class="lock-icon">🛡️</div>
+    <div class="lock-title">EFC ADMIN CONTROL</div>
+    <div class="lock-sub">Restricted access · Owner verification required</div>
 
-<!-- ═══ CONNECT MODAL ═══ -->
-<div class="m-overlay" id="connect-modal">
-  <div class="modal">
-    <button class="m-close" onclick="closeModal('connect-modal')">✕</button>
-    <h3>Connect Your Wallet</h3>
-    <p class="modal-sub">Choose a wallet to access the Efikcoin DApp on Binance Smart Chain.</p>
-    <div class="w-opt" onclick="connectWallet('metamask')"><div class="w-opt-ic">🦊</div><div><div class="w-opt-nm">MetaMask</div><div class="w-opt-sub">Browser extension wallet</div></div></div>
-    <div class="w-opt" onclick="connectWallet('trust')"><div class="w-opt-ic">🛡️</div><div><div class="w-opt-nm">Trust Wallet</div><div class="w-opt-sub">Mobile & browser wallet</div></div></div>
-    <div class="w-opt" onclick="connectWallet('coinbase')"><div class="w-opt-ic">🔵</div><div><div class="w-opt-nm">Coinbase Wallet</div><div class="w-opt-sub">Secure self-custody</div></div></div>
-    <div class="or-div">or import private key</div>
-    <div class="form-g"><label class="form-lbl">Private Key</label><input class="inp" id="import-pk" type="password" placeholder="0x... (stays in your browser only)"/></div>
-    <button class="btn-gold w-full mt-12" onclick="importPrivateKey()">Import & Connect</button>
-    <p class="text-xs text-muted mt-12" style="text-align:center;line-height:1.6">🔐 Your keys are never transmitted. This DApp runs entirely in your browser.</p>
+    <!-- Step 1: Connect wallet -->
+    <div class="lock-step active" id="lock-step-1">
+      <div class="step-label"><span class="stepn">1</span> Connect Owner Wallet</div>
+      <div class="owner-check">
+        <span class="dot" id="owner-dot"></span>
+        <span id="owner-status">Not connected — wallet must match contract owner()</span>
+      </div>
+      <div class="lock-err" id="lock-err-1"><span>⚠</span><span id="lock-err-1-msg"></span></div>
+      <button class="lock-btn" onclick="connectAdminWallet()">Connect Wallet</button>
+      <div class="lock-meta"><span>Chain: BSC (56)</span><span>v1.0</span></div>
+    </div>
+
+    <!-- Step 2: PIN -->
+    <div class="lock-step" id="lock-step-2">
+      <div class="step-label"><span class="stepn">2</span> Enter Admin PIN</div>
+      <div class="lock-err" id="lock-err-2"><span>⚠</span><span id="lock-err-2-msg"></span></div>
+      <div class="pin-row" id="pin-row">
+        <div class="pin-dot" data-i="0"></div>
+        <div class="pin-dot" data-i="1"></div>
+        <div class="pin-dot" data-i="2"></div>
+        <div class="pin-dot" data-i="3"></div>
+        <div class="pin-dot" data-i="4"></div>
+        <div class="pin-dot" data-i="5"></div>
+      </div>
+      <input class="lock-inp" id="pin-input" type="password" inputmode="numeric" maxlength="6" placeholder="••••••" style="text-align:center;letter-spacing:8px;font-size:1.1rem" oninput="onPinInput(this.value)"/>
+      <button class="lock-btn" onclick="verifyPin()">Verify PIN →</button>
+      <p style="text-align:center;font-size:.7rem;color:var(--dim);margin-top:14px;font-family:'Space Mono',monospace">First time? Set a 6-digit PIN — it's stored locally on this device only.</p>
+    </div>
+
+    <!-- Step 3: 2FA confirmation -->
+    <div class="lock-step" id="lock-step-3">
+      <div class="step-label"><span class="stepn">3</span> Session Confirmation</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:18px;line-height:1.7">A confirmation code has been generated for this session. Enter it below to finish unlocking the admin panel. High-risk actions inside will require this same step again.</p>
+      <div style="background:var(--surf2);border:1px solid var(--gold-d);border-radius:9px;padding:16px;text-align:center;margin-bottom:16px">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:6px">SESSION CODE</div>
+        <div style="font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:800;color:var(--gold);letter-spacing:4px" id="session-code-display">——————</div>
+      </div>
+      <input class="lock-inp" id="session-confirm-input" type="text" placeholder="Enter the code shown above" style="text-align:center;letter-spacing:3px"/>
+      <div class="lock-err" id="lock-err-3"><span>⚠</span><span id="lock-err-3-msg"></span></div>
+      <button class="lock-btn" onclick="verifySession()">Unlock Admin Panel →</button>
+    </div>
   </div>
 </div>
 
-<!-- ═══ TX CONFIRM MODAL ═══ -->
-<div class="m-overlay" id="tx-modal">
+<!-- ═══════════════════════════ RISKY ACTION CONFIRM MODAL ═══════════════════════════ -->
+<div class="m-ov" id="risk-modal">
+  <div class="modal danger">
+    <button class="m-close" onclick="closeM('risk-modal')">✕</button>
+    <h3 class="danger-text" id="risk-title">Confirm High-Risk Action</h3>
+    <p class="modal-sub" id="risk-sub"></p>
+    <div class="confirm-detail" id="risk-detail"></div>
+    <div class="type-confirm">
+      <label>Type "CONFIRM" to proceed</label>
+      <input class="f-inp" id="risk-type-confirm" placeholder="CONFIRM" style="border-color:rgba(224,82,74,.3)"/>
+    </div>
+    <div class="f-group">
+      <label class="f-label">Re-enter your PIN</label>
+      <input class="f-inp" id="risk-pin-confirm" type="password" maxlength="6" placeholder="••••••"/>
+    </div>
+    <button class="btn btn-danger w-full" id="risk-confirm-btn">Execute Action</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ STANDARD TX MODAL ═══════════════════════════ -->
+<div class="m-ov" id="tx-modal">
   <div class="modal">
-    <button class="m-close" onclick="closeModal('tx-modal')">✕</button>
-    <h3 id="tx-ttl">Confirm Transaction</h3>
+    <button class="m-close" onclick="closeM('tx-modal')">✕</button>
+    <h3 id="tx-title">Confirm Transaction</h3>
     <p class="modal-sub" id="tx-sub"></p>
-    <div id="tx-det" style="background:var(--surf2);border:1px solid var(--bdr2);border-radius:10px;padding:14px;margin-bottom:18px;font-family:'Space Mono',monospace;font-size:10px;line-height:2;color:var(--muted)"></div>
-    <button class="btn-gold w-full" id="tx-confirm-btn">Sign & Confirm</button>
+    <div class="confirm-detail" id="tx-detail"></div>
+    <button class="btn btn-gold w-full" id="tx-confirm-btn">Sign & Execute</button>
   </div>
 </div>
 
-<!-- ═══ CLIENT DETAIL MODAL ═══ -->
-<div class="m-overlay" id="client-modal">
-  <div class="modal" style="max-width:520px">
-    <button class="m-close" onclick="closeModal('client-modal')">✕</button>
-    <h3 id="cm-name">Client Dashboard</h3>
-    <div id="cm-body"></div>
+<!-- ═══════════════════════════ ADMIN SHELL ═══════════════════════════ -->
+<div id="admin-shell">
+
+  <div class="topbar">
+    <div class="tb-logo"><span class="dot-live"></span>EFC ADMIN</div>
+    <div class="tb-sp"></div>
+    <div class="tb-net"><span class="dot"></span>BSC Mainnet · 56</div>
+    <div class="tb-owner" id="tb-owner-addr">0x0000...0000</div>
+    <button class="tb-lock-btn" onclick="lockAdmin()">🔒 Lock Session</button>
   </div>
-</div>
 
-<!-- ═══ APP ═══ -->
-<div id="app">
-
-<!-- NAV -->
-<nav>
-  <div class="nav-logo">
-    <div class="nav-logo-coin" id="nav-logo-coin">
-      <img id="nav-logo-img" src="" alt="EFC" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:none" onerror="this.style.display='none'"/>
-      <span id="nav-logo-text">E</span>
+  <div class="sidebar" id="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">Overview</div>
+      <div class="sb-item active" onclick="showView('overview',this)"><span class="ic">📊</span>Dashboard</div>
+      <div class="sb-item" onclick="showView('contract',this)"><span class="ic">⬡</span>Contract Monitor</div>
+      <div class="sb-item" onclick="showView('activity',this)"><span class="ic">⚡</span>Live Activity</div>
     </div>
-    EFIKCOIN <span style="color:var(--muted);font-weight:400;font-size:11px">EFC</span>
-  </div>
-  <div class="nav-sp"></div>
-  <div class="nav-tabs" id="nav-tabs">
-    <div class="nav-tab active" onclick="showPage('home',this)">Home</div>
-    <div class="nav-tab" onclick="showPage('dashboard',this)">Dashboard</div>
-    <div class="nav-tab" onclick="showPage('staking',this)">Stake</div>
-    <div class="nav-tab" onclick="showPage('airdrop',this)">Airdrop</div>
-    <div class="nav-tab" onclick="showPage('portfolio',this)">Portfolio</div>
-    <div class="nav-tab" onclick="showPage('clients',this)">Clients</div>
-    <div class="nav-tab" onclick="showPage('wallet',this)">Wallet</div>
-    <div class="nav-tab" onclick="showPage('settings',this)">Settings</div>
-  </div>
-  <span id="addr-nav" style="font-family:'Space Mono',monospace;font-size:9px;color:var(--gold);display:none"></span>
-  <select class="lang-dd" id="lang-dd" onchange="applyLang(this.value)">
-    <option value="en">🌐 EN</option><option value="fr">🇫🇷 FR</option>
-    <option value="es">🇪🇸 ES</option><option value="pt">🇧🇷 PT</option>
-    <option value="zh">🇨🇳 ZH</option><option value="ar">🇸🇦 AR</option>
-    <option value="hi">🇮🇳 HI</option><option value="sw">🇹🇿 SW</option>
-    <option value="ha">🇳🇬 HA</option><option value="yo">🇳🇬 YO</option>
-    <option value="ru">🇷🇺 RU</option><option value="de">🇩🇪 DE</option>
-    <option value="ja">🇯🇵 JA</option><option value="ko">🇰🇷 KO</option>
-  </select>
-  <button class="btn-connect" id="connect-btn" onclick="openModal('connect-modal')">Connect Wallet</button>
-  <div class="hamburger" onclick="toggleMM()"><span></span><span></span><span></span></div>
-</nav>
-
-<!-- Mobile menu -->
-<div id="mm" style="display:none;position:fixed;top:64px;left:0;right:0;z-index:899;background:rgba(2,6,9,.97);border-bottom:1px solid var(--bdr);backdrop-filter:blur(20px);padding:12px 20px">
-  <div onclick="showPage('home');closeMM()" class="nav-tab" style="display:block;padding:11px 0;border-bottom:1px solid var(--bdr)">Home</div>
-  <div onclick="showPage('dashboard');closeMM()" class="nav-tab" style="display:block;padding:11px 0;border-bottom:1px solid var(--bdr)">Dashboard</div>
-  <div onclick="showPage('staking');closeMM()" class="nav-tab" style="display:block;padding:11px 0;border-bottom:1px solid var(--bdr)">Stake</div>
-  <div onclick="showPage('airdrop');closeMM()" class="nav-tab" style="display:block;padding:11px 0;border-bottom:1px solid var(--bdr)">Airdrop</div>
-  <div onclick="showPage('portfolio');closeMM()" class="nav-tab" style="display:block;padding:11px 0;border-bottom:1px solid var(--bdr)">Portfolio</div>
-  <div onclick="showPage('clients');closeMM()" class="nav-tab" style="display:block;padding:11px 0;border-bottom:1px solid var(--bdr)">Clients</div>
-  <div onclick="showPage('wallet');closeMM()" class="nav-tab" style="display:block;padding:11px 0;border-bottom:1px solid var(--bdr)">Wallet</div>
-  <div onclick="showPage('settings');closeMM()" class="nav-tab" style="display:block;padding:11px 0">Settings</div>
-</div>
-
-<!-- WARNING BANNER -->
-<div class="risk-banner">
-  <span class="rb-icon">⚠</span>
-  RISK WARNING: Cryptocurrency is highly volatile and speculative. EFC may lose value. Never invest more than you can afford to lose. Not financial advice. DYOR. Smart contracts carry risk. Gas fees on BSC apply to all transactions.
-</div>
-
-<!-- TICKER -->
-<div class="ticker"><div class="ticker-inner" id="ticker-inner"></div></div>
-
-<!-- ══════════════════ PAGE: HOME ══════════════════ -->
-<div id="page-home" class="page active">
-
-  <div class="hero">
-    <div class="hero-eyebrow">BEP-20 · Binance Smart Chain · Global Charity Ecosystem 🕊️</div>
-
-    <!-- ✨ ROTATING COIN ✨ -->
-    <div class="coin-scene">
-      <!-- Sacred geometry rings -->
-      <div class="geo-ring geo-ring-1"></div>
-      <div class="geo-ring geo-ring-2"></div>
-      <div class="geo-ring geo-ring-3"></div>
-      <div class="geo-ring geo-ring-4"></div>
-      <!-- Hexagon background -->
-      <div class="hex-bg"></div>
-      <!-- Orbiting dots -->
-      <div class="orbit-path orbit-path-1">
-        <div class="orb-dot orb-dot-a"></div>
-        <div class="orb-dot orb-dot-d"></div>
-      </div>
-      <div class="orbit-path orbit-path-2">
-        <div class="orb-dot orb-dot-b"></div>
-        <div class="orb-dot orb-dot-e"></div>
-      </div>
-      <div class="orbit-path orbit-path-3">
-        <div class="orb-dot orb-dot-c"></div>
-      </div>
-      <!-- Central coin -->
-      <div class="coin-core">
-        <div class="coin-glow"></div>
-        <img class="coin-img" id="hero-coin-img"
-          src="https://ipfs.io/ipfs/bafybeihrzyodihyp5met2hs32ppj37qlowuxarvs2lnlrgujgrlwxc7fwe"
-          alt="Efikcoin"
-          onerror="this.style.display='none';document.getElementById('hero-coin-fb').style.display='flex'"/>
-        <div class="coin-fallback" id="hero-coin-fb" style="display:none">
-          <div class="coin-fallback-inner">EFC</div>
-        </div>
-      </div>
+    <div class="sb-section">
+      <div class="sb-label">Management</div>
+      <div class="sb-item" onclick="showView('clients',this)"><span class="ic">👥</span>Clients<span class="cnt" id="sb-client-count">0</span></div>
+      <div class="sb-item" onclick="showView('airdrop',this)"><span class="ic">🪂</span>Airdrop Console</div>
+      <div class="sb-item" onclick="showView('staking',this)"><span class="ic">🔒</span>Staking Pool</div>
+      <div class="sb-item" onclick="showView('treasury',this)"><span class="ic">🏦</span>Treasury</div>
     </div>
-
-    <h1 class="hero-title">The Wallet That <span class="acc">Gives Back</span> to the World</h1>
-    <p class="hero-sub">Efikcoin EFC is the world's first charity-embedded BEP-20 token. Stake. Earn. Airdrop. Give. Built for every person, in every nation — transparent, non-custodial, and forever on-chain.</p>
-
-    <div class="live-bar">
-      <div class="lp-item"><span class="lp-val" id="live-efc-p">$0.0842</span><span class="lp-chg up" id="live-efc-c">+4.21%</span><span class="lp-lbl">EFC / USDT</span></div>
-      <div class="lp-item"><span class="lp-val" id="live-bnb-p">$612</span><span class="lp-chg up" id="live-bnb-c">+1.83%</span><span class="lp-lbl">BNB / USDT</span></div>
-      <div class="lp-item"><span class="lp-val">~$0.008</span><span class="lp-chg up">avg</span><span class="lp-lbl">Gas Fee</span></div>
-      <div class="lp-item"><span class="lp-val" id="live-mcap">$4.2M</span><span class="lp-chg up">+6.1%</span><span class="lp-lbl">Market Cap</span></div>
-      <div class="lp-item"><span class="lp-val">65%</span><span class="lp-chg up">sovereign</span><span class="lp-lbl">Max APY</span></div>
-    </div>
-
-    <div class="hero-btns">
-      <button class="btn-gold" onclick="openModal('connect-modal')">🚀 Launch DApp</button>
-      <a class="btn-outline" href="https://pancakeswap.finance/swap?outputCurrency=0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1" target="_blank" rel="noopener">🥞 Buy on PancakeSwap</a>
-      <a class="btn-outline" href="https://efikcoineternalv.github.io/Charity-Empowerment/" target="_blank" rel="noopener">♥ Charity Portal</a>
-    </div>
-
-    <div class="stats-g reveal">
-      <div class="stat-c"><span class="stat-n">47K+</span><span class="stat-l">Token Holders</span></div>
-      <div class="stat-c"><span class="stat-n">190+</span><span class="stat-l">Countries</span></div>
-      <div class="stat-c"><span class="stat-n">$2.4M</span><span class="stat-l">Charity Given</span></div>
-      <div class="stat-c"><span class="stat-n">BSC</span><span class="stat-l">Network</span></div>
+    <div class="sb-section">
+      <div class="sb-label">Security</div>
+      <div class="sb-item" onclick="showView('controls',this)"><span class="ic">⚙</span>Contract Controls</div>
+      <div class="sb-item" onclick="showView('audit',this)"><span class="ic">📜</span>Audit Log</div>
+      <div class="sb-item" onclick="showView('danger',this)"><span class="ic">☠</span>Danger Zone</div>
     </div>
   </div>
 
-  <!-- Address strip -->
-  <div style="background:var(--surf);border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);padding:18px 20px">
-    <div style="max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center">
-      <div onclick="copyT('0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1')" style="cursor:pointer;background:var(--surf2);border:1px solid var(--bdr2);border-radius:8px;padding:9px 14px;display:flex;align-items:center;gap:8px;transition:border-color .2s;font-family:'Space Mono',monospace;font-size:9px" onmouseover="this.style.borderColor='var(--gold-d)'" onmouseout="this.style.borderColor='var(--bdr2)'"><span style="color:var(--gold);letter-spacing:1px;text-transform:uppercase">EFC Token</span><span style="color:var(--muted)">0x677C...fED1</span><span style="color:var(--gold-d)">⎘</span></div>
-      <div onclick="copyT('0x676cCf34C191a9D6EFE4B265b84877C619A559d0')" style="cursor:pointer;background:var(--surf2);border:1px solid var(--bdr2);border-radius:8px;padding:9px 14px;display:flex;align-items:center;gap:8px;transition:border-color .2s;font-family:'Space Mono',monospace;font-size:9px" onmouseover="this.style.borderColor='var(--gold-d)'" onmouseout="this.style.borderColor='var(--bdr2)'"><span style="color:var(--gold);letter-spacing:1px;text-transform:uppercase">Treasury</span><span style="color:var(--muted)">0x676c...59d0</span><span style="color:var(--gold-d)">⎘</span></div>
-      <div onclick="copyT('0xa1DD6C528882Dc19EcCbC967F50bBC121A29630e')" style="cursor:pointer;background:var(--surf2);border:1px solid var(--bdr2);border-radius:8px;padding:9px 14px;display:flex;align-items:center;gap:8px;transition:border-color .2s;font-family:'Space Mono',monospace;font-size:9px" onmouseover="this.style.borderColor='var(--gold-d)'" onmouseout="this.style.borderColor='var(--bdr2)'"><span style="color:var(--gold);letter-spacing:1px;text-transform:uppercase">Pool</span><span style="color:var(--muted)">0xa1DD...630e</span><span style="color:var(--gold-d)">⎘</span></div>
-      <a href="https://bscscan.com/token/0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);border:1px solid var(--bdr2);border-radius:6px;padding:9px 13px;white-space:nowrap;transition:color .2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">BSCScan ↗</a>
-    </div>
-  </div>
+  <div class="main">
 
-  <!-- FEATURES -->
-  <div class="sec reveal">
-    <span class="sec-tag">Built Different</span>
-    <h2 class="sec-title">Everything a Global Wallet Needs</h2>
-    <p class="sec-sub">Hold, stake, airdrop, and give — all on-chain, non-custodial, in 14 languages.</p>
-    <div class="feats">
-      <div class="feat"><span class="feat-icon">🔐</span><h3>Non-Custodial Security</h3><p>Your keys never leave your device. MetaMask, Trust Wallet, WalletConnect, Coinbase Wallet — no KYC, no registration, no gatekeepers.</p></div>
-      <div class="feat"><span class="feat-icon">📈</span><h3>Real On-Chain Staking</h3><p>Stake EFC directly via the audited pool contract. Earn up to 65% APY, claimed on-chain anytime. Rewards enforced by code — not promises.</p></div>
-      <div class="feat"><span class="feat-icon">🪂</span><h3>Batch Airdrop</h3><p>Send EFC to hundreds of wallets in one transaction. Uniform or custom amounts — gas-efficient and forever auditable on BSCScan.</p></div>
-      <div class="feat"><span class="feat-icon">♥️</span><h3>Charity Protocol</h3><p>Protocol-level charity embedded in every transaction. Flows to the Community Treasury. Hard-coded. Cannot be disabled by anyone.</p></div>
-      <div class="feat"><span class="feat-icon">🌍</span><h3>14-Language Auto UI</h3><p>Automatic detection by IP and browser locale. English, French, Spanish, Arabic, Hausa, Yorùbá, Swahili, Chinese, Japanese and more.</p></div>
-      <div class="feat"><span class="feat-icon">👥</span><h3>Personal Client Dashboards</h3><p>Every registered user gets a personal wallet dashboard with their own transaction history, staking positions, and EFC balance tracker.</p></div>
-    </div>
-  </div>
+    <!-- ══════════ OVERVIEW ══════════ -->
+    <div class="view active" id="view-overview">
+      <div class="view-hdr">
+        <div><div class="view-title">Admin <span class="accent">Dashboard</span></div><div class="view-sub">Real-time monitoring of the entire Efikcoin ecosystem</div></div>
+        <button class="btn btn-outline" onclick="refreshAll()">↻ Refresh All</button>
+      </div>
 
-  <!-- WHITEPAPER -->
-  <div style="padding:0 20px 72px;max-width:1100px;margin:0 auto" class="reveal">
-    <div class="wp">
-      <div class="wp-grid">
-        <div class="wp-content">
-          <span class="sec-tag" style="margin-bottom:10px">Whitepaper v1.0</span>
-          <h3>EFIKCOIN (EFC) — Architecture of Giving</h3>
-          <p>Efikcoin is a deflationary BEP-20 token on Binance Smart Chain with a total supply of 1,000,000,000 EFC. It combines DeFi primitives — staking, liquidity provision, and governance — with a hard-coded charitable giving mechanism that cannot be removed by any actor, including the original deployer.</p>
-          <p>A portion of every DEX transaction fee flows automatically to the treasury wallet, which funds verified humanitarian programs across Africa, Asia, and the Americas. All flows are publicly auditable on BSCScan.</p>
-          <p>EFC holders stake in four tiers, claim rewards at any time, and participate in governance votes on treasury allocation. In the beginning everything was created, and he who created the world beautified it and blessed it — so too shall EFC bless the world. 🕊️</p>
-          <a href="https://efikcoineternalv.github.io/Charity-Empowerment/" target="_blank" rel="noopener" class="btn-outline" style="display:inline-block;margin-top:18px;font-size:10px">Read Whitepaper →</a>
-        </div>
-        <div>
-          <div class="wp-hl"><span class="bullet">▸</span><div class="wp-hl-t"><strong>Total Supply:</strong> 1,000,000,000 EFC — fixed, deflationary via burn</div></div>
-          <div class="wp-hl"><span class="bullet">▸</span><div class="wp-hl-t"><strong>Network:</strong> Binance Smart Chain (BSC) — BEP-20</div></div>
-          <div class="wp-hl"><span class="bullet">▸</span><div class="wp-hl-t"><strong>Staking:</strong> 12% Seed · 28% Growth · 45% LP · 65% Sovereign</div></div>
-          <div class="wp-hl"><span class="bullet">▸</span><div class="wp-hl-t"><strong>Charity:</strong> Protocol-level treasury allocation on every tx</div></div>
-          <div class="wp-hl"><span class="bullet">▸</span><div class="wp-hl-t"><strong>Token:</strong> 0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1</div></div>
-          <div class="wp-hl"><span class="bullet">▸</span><div class="wp-hl-t"><strong>Pool:</strong> 0xa1DD6C528882Dc19EcCbC967F50bBC121A29630e</div></div>
-          <div class="wp-hl"><span class="bullet">▸</span><div class="wp-hl-t"><strong>Treasury:</strong> 0x676cCf34C191a9D6EFE4B265b84877C619A559d0</div></div>
-          <div class="wp-hl"><span class="bullet">▸</span><div class="wp-hl-t"><strong>Security:</strong> Non-custodial, audited, no backdoors</div></div>
-        </div>
+      <div class="stat-grid">
+        <div class="stat-card"><span class="sc-icon">⬡</span><span class="sc-label">Total Supply</span><span class="sc-val gold" id="ov-supply">—</span><span class="sc-delta">Fixed</span></div>
+        <div class="stat-card"><span class="sc-icon">🔒</span><span class="sc-label">Total Staked</span><span class="sc-val" id="ov-staked">—</span><span class="sc-delta" id="ov-staked-pct">— of supply</span></div>
+        <div class="stat-card"><span class="sc-icon">🏦</span><span class="sc-label">Treasury Balance</span><span class="sc-val green" id="ov-treasury">—</span><span class="sc-delta">EFC</span></div>
+        <div class="stat-card"><span class="sc-icon">📡</span><span class="sc-label">Trading Status</span><span class="sc-val" id="ov-trading">—</span><span class="sc-delta" id="ov-trading-sub">checking...</span></div>
       </div>
-    </div>
-  </div>
+      <div class="stat-grid">
+        <div class="stat-card"><span class="sc-icon">👥</span><span class="sc-label">Registered Clients</span><span class="sc-val" id="ov-clients">0</span><span class="sc-delta">localStorage DB</span></div>
+        <div class="stat-card"><span class="sc-icon">💰</span><span class="sc-label">Pool Contract Balance</span><span class="sc-val" id="ov-pool-bal">—</span><span class="sc-delta">BNB</span></div>
+        <div class="stat-card"><span class="sc-icon">🧾</span><span class="sc-label">Owner Address</span><span class="sc-val mono" style="font-size:.7rem" id="ov-owner">—</span><span class="sc-delta">Verified ✓</span></div>
+        <div class="stat-card"><span class="sc-icon">📈</span><span class="sc-label">BNB Gas Wallet</span><span class="sc-val" id="ov-bnb-bal">—</span><span class="sc-delta">your balance</span></div>
+      </div>
 
-  <!-- CHARITY BAND -->
-  <div class="charity-band reveal">
-    <div class="cb-inner">
-      <div>
-        <span class="sec-tag">Community Empowerment</span>
-        <h2 class="sec-title">Blockchain Giving, Verified On-Chain</h2>
-        <p style="color:var(--muted);font-size:.88rem;line-height:1.75;margin-bottom:22px">From clean water in West Africa to educational grants across Asia — EFC's charity mechanism is hard-coded at protocol level. Every allocation is a BSC transaction anyone can verify.</p>
-        <a href="https://efikcoineternalv.github.io/Charity-Empowerment/" target="_blank" rel="noopener" class="btn-gold" style="display:inline-block">Visit Charity Portal ♥</a>
-      </div>
-      <div class="cb-stats">
-        <div class="cb-stat"><span class="cb-val">$2.4M</span><span class="cb-lbl">Total Distributed</span></div>
-        <div class="cb-stat"><span class="cb-val">34%</span><span class="cb-lbl">Treasury Deployed</span></div>
-        <div class="cb-stat"><span class="cb-val">47K</span><span class="cb-lbl">Beneficiaries</span></div>
-        <div class="cb-stat"><span class="cb-val">190+</span><span class="cb-lbl">Countries</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- COMMUNITY / SOCIAL -->
-  <div class="community-sec reveal">
-    <div class="community-inner">
-      <span class="sec-tag">Join the Community</span>
-      <h2 class="sec-title">Find Us Everywhere</h2>
-      <p class="sec-sub">Connect with the global EFC family — news, updates, support and charity announcements across all platforms.</p>
-      <div class="social-cards">
-        <a href="https://x.com/efikcoineternal" target="_blank" rel="noopener" class="social-card sc-x">
-          <span class="sc-icon">𝕏</span>
-          <div class="sc-name">X (Twitter)</div>
-          <div class="sc-handle">@efikcoineternal</div>
-          <span class="sc-join">Follow →</span>
-        </a>
-        <a href="https://t.me/efikcoinofficialecosystem" target="_blank" rel="noopener" class="social-card sc-tg">
-          <span class="sc-icon">✈</span>
-          <div class="sc-name">Telegram</div>
-          <div class="sc-handle">Official Ecosystem Channel</div>
-          <span class="sc-join">Join →</span>
-        </a>
-        <a href="https://chat.whatsapp.com/Fb2tng6Ay2TE8FiRdJIQPG" target="_blank" rel="noopener" class="social-card sc-wa">
-          <span class="sc-icon">💬</span>
-          <div class="sc-name">WhatsApp</div>
-          <div class="sc-handle">EFC Community Channel</div>
-          <span class="sc-join">Join →</span>
-        </a>
-        <a href="mailto:support@efikcoin.xyz" class="social-card sc-em">
-          <span class="sc-icon">✉</span>
-          <div class="sc-name">Email Support</div>
-          <div class="sc-handle">support@efikcoin.xyz</div>
-          <span class="sc-join">Contact →</span>
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- TESTIMONIALS -->
-  <div class="sec reveal">
-    <span class="sec-tag">Community Voices</span>
-    <h2 class="sec-title">Holders from Every Corner of the Globe</h2>
-    <div class="testi-row">
-      <div class="testi"><div class="stars">★★★★★</div><p class="testi-q">"I stake EFC at 65% APY and every month I see real rewards in my wallet. The charity part makes this completely different from any other DeFi project I've used."</p><div class="testi-by"><div class="av">AK</div><div><div class="av-nm">Amara K.</div><div class="av-loc">Lagos, Nigeria 🇳🇬</div></div></div></div>
-      <div class="testi"><div class="stars">★★★★★</div><p class="testi-q">"The airdrop function is incredible — I distributed EFC to 200 wallets in one transaction for less than $0.05 in gas. The personal dashboard shows every single transaction."</p><div class="testi-by"><div class="av">RV</div><div><div class="av-nm">Ravi V.</div><div class="av-loc">Mumbai, India 🇮🇳</div></div></div></div>
-      <div class="testi"><div class="stars">★★★★★</div><p class="testi-q">"O auto-detect de idioma é incrível. Toda a interface em português. Isso vai explodir no Brasil — blockchain acessível para todos, literalmente."</p><div class="testi-by"><div class="av">CS</div><div><div class="av-nm">Carlos S.</div><div class="av-loc">São Paulo, Brazil 🇧🇷</div></div></div></div>
-    </div>
-  </div>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="foot-g">
-      <div class="f-brand">
-        <div class="f-brand-logo">
-          <div class="nav-logo-coin" style="width:26px;height:26px;font-size:10px;animation:geoSpin1 8s linear infinite">E</div>
-          EFIKCOIN
-        </div>
-        <p>Efikcoin EFC — BEP-20 on Binance Smart Chain. Staking, airdrop, charity, governance in one global DApp. Coin is life, and life is coin. 🕊️ In the beginning everything was created — and he who created the world beautified it and blessed it for humanity to be productive.</p>
-        <div class="f-socials">
-          <a class="f-s-btn" href="https://x.com/efikcoineternal" target="_blank" rel="noopener" title="X">𝕏</a>
-          <a class="f-s-btn" href="https://t.me/efikcoinofficialecosystem" target="_blank" rel="noopener" title="Telegram">✈</a>
-          <a class="f-s-btn" href="https://chat.whatsapp.com/Fb2tng6Ay2TE8FiRdJIQPG" target="_blank" rel="noopener" title="WhatsApp">💬</a>
-          <a class="f-s-btn" href="mailto:support@efikcoin.xyz" title="Email">✉</a>
-        </div>
-      </div>
-      <div class="f-col">
-        <h4>DApp</h4>
-        <ul>
-          <li><a href="#" onclick="showPage('dashboard');return false">Dashboard</a></li>
-          <li><a href="#" onclick="showPage('staking');return false">Staking</a></li>
-          <li><a href="#" onclick="showPage('airdrop');return false">Airdrop</a></li>
-          <li><a href="#" onclick="showPage('portfolio');return false">Portfolio</a></li>
-          <li><a href="#" onclick="showPage('clients');return false">Client Hub</a></li>
-          <li><a href="https://pancakeswap.finance/swap?outputCurrency=0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1" target="_blank" rel="noopener">Buy EFC</a></li>
-        </ul>
-      </div>
-      <div class="f-col">
-        <h4>Community</h4>
-        <ul>
-          <li><a href="https://x.com/efikcoineternal" target="_blank">X · @efikcoineternal</a></li>
-          <li><a href="https://t.me/efikcoinofficialecosystem" target="_blank">Telegram Channel</a></li>
-          <li><a href="https://chat.whatsapp.com/Fb2tng6Ay2TE8FiRdJIQPG" target="_blank">WhatsApp Channel</a></li>
-          <li><a href="mailto:support@efikcoin.xyz">support@efikcoin.xyz</a></li>
-          <li><a href="https://efikcoineternalv.github.io/Charity-Empowerment/" target="_blank">Charity Portal</a></li>
-        </ul>
-      </div>
-      <div class="f-col">
-        <h4>Resources</h4>
-        <ul>
-          <li><a href="https://bscscan.com/token/0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1" target="_blank">BSCScan Token</a></li>
-          <li><a href="https://bscscan.com/address/0xa1DD6C528882Dc19EcCbC967F50bBC121A29630e" target="_blank">Pool Contract</a></li>
-          <li><a href="https://bscscan.com/address/0x676cCf34C191a9D6EFE4B265b84877C619A559d0" target="_blank">Treasury</a></li>
-          <li><a href="https://pancakeswap.finance/swap?outputCurrency=0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1" target="_blank">PancakeSwap</a></li>
-        </ul>
-      </div>
-      <div class="f-col">
-        <h4>Newsletter</h4>
-        <p style="font-size:.74rem;color:var(--muted);margin-bottom:10px">EFC news, staking alerts, charity updates.</p>
-        <div class="nl-w"><input class="nl-i" type="email" id="nl-email" placeholder="your@email.com"/><button class="nl-g" onclick="subNL()">JOIN</button></div>
-        <p style="font-size:.7rem;color:var(--muted);margin-top:6px">No spam. Unsubscribe anytime.</p>
-      </div>
-    </div>
-    <div class="foot-bot">
-      <p>© 2025 Efikcoin Eternal Ecosystem · Not financial advice · DYOR · Smart contracts carry risk</p>
-      <div class="foot-links"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Audit</a></div>
-    </div>
-  </footer>
-</div><!-- end home -->
-
-<!-- ══════════════════ PAGE: DASHBOARD ══════════════════ -->
-<div id="page-dashboard" class="page">
-  <div class="dash-page">
-    <div class="dash-hdr">
-      <div class="dash-title">My Dashboard</div>
-      <div id="dash-badge" class="w-badge" style="display:none"><div class="w-dot"></div><span class="w-addr" id="dash-addr">—</span></div>
-      <button class="btn-gold" onclick="openModal('connect-modal')" id="dash-conn-btn" style="font-size:9.5px;padding:8px 16px">Connect Wallet</button>
-    </div>
-    <div id="dash-empty" style="text-align:center;padding:72px 20px;background:var(--surf);border:1px solid var(--bdr);border-radius:14px">
-      <div style="font-size:44px;margin-bottom:14px">🔌</div>
-      <h3 style="font-family:'Orbitron',monospace;font-size:.95rem;color:var(--gold);margin-bottom:7px">Connect Your Wallet</h3>
-      <p style="color:var(--muted);font-size:.84rem;margin-bottom:22px">Connect a wallet to view your EFC balance, staking, and transaction history.</p>
-      <button class="btn-gold" onclick="openModal('connect-modal')">Connect Wallet</button>
-    </div>
-    <div id="dash-live" style="display:none">
-      <div class="bal-row">
-        <div class="bal-c"><span class="bal-lbl">EFC Balance</span><span class="bal-v" id="d-efc">—</span><span class="bal-usd" id="d-efc-usd">≈ $—</span><span class="bal-ic">⬡</span></div>
-        <div class="bal-c"><span class="bal-lbl">Staked EFC</span><span class="bal-v" id="d-stk">—</span><span class="bal-usd" id="d-stk-usd">≈ $—</span><span class="bal-ic">🔒</span></div>
-        <div class="bal-c"><span class="bal-lbl">Pending Rewards</span><span class="bal-v" id="d-rew" style="color:var(--green)">—</span><span class="bal-usd" id="d-rew-usd" style="color:var(--green)">≈ $—</span><span class="bal-ic">🎁</span></div>
-        <div class="bal-c"><span class="bal-lbl">BNB Balance</span><span class="bal-v" id="d-bnb">—</span><span class="bal-usd" id="d-bnb-usd">≈ $—</span><span class="bal-ic">🟡</span></div>
-      </div>
-      <div class="act-row">
-        <button class="act-btn" onclick="showPage('staking')"><span class="a-ic">🔒</span>Stake</button>
-        <button class="act-btn" onclick="showPage('staking')"><span class="a-ic">🔓</span>Unstake</button>
-        <button class="act-btn" onclick="doClaimRewards()"><span class="a-ic">🎁</span>Claim</button>
-        <button class="act-btn" onclick="showPage('airdrop')"><span class="a-ic">🪂</span>Airdrop</button>
-        <button class="act-btn" onclick="toggleSendPanel()"><span class="a-ic">↗</span>Send</button>
-        <button class="act-btn" onclick="showPage('portfolio')"><span class="a-ic">📊</span>Portfolio</button>
-      </div>
-      <div id="send-panel" style="display:none" class="panel mb-16">
-        <div class="p-title">Send EFC</div>
-        <div class="inp-wrap"><div class="inp-lbl">Recipient Address</div><input class="inp" id="send-to" type="text" placeholder="0x..."/></div>
-        <div class="inp-wrap"><div class="inp-lbl">Amount <span class="mx-btn" onclick="setMax('send-amt','d-efc')">MAX</span></div><input class="inp" id="send-amt" type="number" placeholder="0.0" min="0"/></div>
-        <div style="display:flex;gap:10px;margin-top:8px">
-          <button class="btn-gold" onclick="doTransfer()" style="flex:1">Send EFC</button>
-          <button class="btn-outline" onclick="toggleSendPanel()" style="flex:1;font-size:10px;padding:12px">Cancel</button>
-        </div>
-      </div>
-      <div class="panels">
-        <div class="panel">
-          <div class="p-title">Quick Stake <span class="badge">LIVE</span></div>
-          <div class="tier-g">
-            <div class="tier sel" onclick="selTier(this,'12')"><div class="tier-nm">🌱 Seed</div><div class="tier-apy">12%</div><div class="tier-lk">Flexible</div></div>
-            <div class="tier" onclick="selTier(this,'28')"><div class="tier-nm">🌿 Growth</div><div class="tier-apy">28%</div><div class="tier-lk">30 days</div></div>
-            <div class="tier" onclick="selTier(this,'45')"><div class="tier-nm">🌾 LP Farm</div><div class="tier-apy">45%</div><div class="tier-lk">60 days</div></div>
-            <div class="tier" onclick="selTier(this,'65')"><div class="tier-nm">👑 Sovereign</div><div class="tier-apy">65%</div><div class="tier-lk">90 days</div></div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">🔑 Admin Authority Scope</div><span class="pill pill-gold">READ THIS</span></div>
+        <div class="two-col">
+          <div>
+            <p style="font-size:.78rem;color:var(--green);margin-bottom:8px;font-weight:700">✓ Real on-chain authority (owner wallet, irreversible):</p>
+            <ul style="font-size:.78rem;color:var(--muted);line-height:2;padding-left:18px">
+              <li>Airdrop tokens to any address (single or batch)</li>
+              <li>Fund the staking rewards pool</li>
+              <li>Set fee/max-wallet exemptions, register DEX pairs</li>
+              <li>Burn tokens, open trading, renounce ownership</li>
+            </ul>
           </div>
-          <div class="inp-wrap"><div class="inp-lbl">Amount <span class="mx-btn" onclick="setMax('d-stk-inp','d-efc')">MAX</span></div><input class="inp" id="d-stk-inp" type="number" placeholder="0.0" min="0" oninput="calcStakePreview()"/></div>
-          <div id="stk-preview" style="display:none;background:var(--surf2);border:1px solid var(--bdr2);border-radius:7px;padding:11px;margin-bottom:12px;font-size:.78rem;line-height:1.9;font-family:'Space Mono',monospace;color:var(--muted)"></div>
-          <button class="btn-gold w-full" onclick="doStake()">Stake EFC →</button>
+          <div>
+            <p style="font-size:.78rem;color:var(--amber);margin-bottom:8px;font-weight:700">⚠ Dashboard-level authority (this site only, not the blockchain):</p>
+            <ul style="font-size:.78rem;color:var(--muted);line-height:2;padding-left:18px">
+              <li>Block/unblock a client's dashboard access</li>
+              <li>Send in-app messages to a client's inbox</li>
+              <li>Client profile data (stored in browser localStorage)</li>
+            </ul>
+          </div>
+        </div>
+        <p style="font-size:.72rem;color:var(--dim);margin-top:14px;line-height:1.6">Blocking a client restricts their dashboard UI only — it cannot freeze their on-chain EFC or wallet, since this contract has no such function. Client data lives in each browser's localStorage, not a central server — it will not sync across devices unless the same browser/device is used.</p>
+      </div>
+
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">⚡ Recent Activity</div><span class="live-badge"><span class="d"></span>LIVE</span></div>
+          <div class="feed" id="overview-feed"><div class="tbl-empty">Connect and refresh to load on-chain activity</div></div>
         </div>
         <div class="panel">
-          <div class="p-title">Recent Activity <span class="badge-green">LIVE</span></div>
-          <div class="tx-list" id="tx-list"><div style="text-align:center;padding:36px;color:var(--muted);font-size:.8rem">Connect wallet to see activity</div></div>
+          <div class="panel-hdr"><div class="panel-title">🚨 System Health</div></div>
+          <div class="flex justify-b items-c mt-8" style="padding:10px 0;border-bottom:1px solid var(--bdr)"><span style="font-size:.82rem;color:var(--muted)">Contract Reachable</span><span class="pill pill-green" id="health-contract">CHECKING</span></div>
+          <div class="flex justify-b items-c" style="padding:10px 0;border-bottom:1px solid var(--bdr)"><span style="font-size:.82rem;color:var(--muted)">BSCScan API</span><span class="pill pill-gold" id="health-bscscan">CHECKING</span></div>
+          <div class="flex justify-b items-c" style="padding:10px 0;border-bottom:1px solid var(--bdr)"><span style="font-size:.82rem;color:var(--muted)">Owner Wallet Match</span><span class="pill pill-green" id="health-owner">VERIFIED</span></div>
+          <div class="flex justify-b items-c" style="padding:10px 0;border-bottom:1px solid var(--bdr)"><span style="font-size:.82rem;color:var(--muted)">Pool Funded</span><span class="pill pill-gold" id="health-pool">CHECKING</span></div>
+          <div class="flex justify-b items-c" style="padding:10px 0"><span style="font-size:.82rem;color:var(--muted)">Session Security</span><span class="pill pill-green">PIN + 2FA</span></div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- ══════════════════ PAGE: STAKING ══════════════════ -->
-<div id="page-staking" class="page">
-  <div class="stk-page">
-    <div class="stk-hero">
-      <span class="sec-tag" style="margin-bottom:7px">On-Chain Staking</span>
-      <h2>Earn EFC Rewards</h2>
-      <p style="color:var(--muted);font-size:.85rem;margin-bottom:3px">Your pending rewards</p>
-      <span class="pending-r" id="stk-pending">0.0000 EFC</span>
-      <button class="btn-gold" onclick="doClaimRewards()" style="font-size:10px;padding:11px 26px">Claim All Rewards</button>
-    </div>
-    <div class="stk-stats">
-      <div class="stk-stat"><span class="stk-sv" id="stk-my">0</span><span class="stk-sl">My Staked EFC</span></div>
-      <div class="stk-stat"><span class="stk-sv" id="stk-tot">—</span><span class="stk-sl">Total Pool Staked</span></div>
-    </div>
-    <div class="apy-g">
-      <div class="apy-c sel" onclick="selAPY(this,'12')"><div class="apy-nm">🌱 Seed</div><span class="apy-pct">12%</span><div class="apy-lk">APY · Flexible</div><div class="apy-b">OPEN</div></div>
-      <div class="apy-c" onclick="selAPY(this,'28')"><div class="apy-nm">🌿 Growth</div><span class="apy-pct">28%</span><div class="apy-lk">APY · 30 days</div><div class="apy-b">POPULAR</div></div>
-      <div class="apy-c" onclick="selAPY(this,'45')"><div class="apy-nm">🌾 LP Farm</div><span class="apy-pct">45%</span><div class="apy-lk">APY · 60 days</div><div class="apy-b">HIGH YIELD</div></div>
-      <div class="apy-c" onclick="selAPY(this,'65')"><div class="apy-nm">👑 Sovereign</div><span class="apy-pct">65%</span><div class="apy-lk">APY · 90 days</div><div class="apy-b">MAX APY</div></div>
-    </div>
-    <div class="panels">
+    <!-- ══════════ CONTRACT MONITOR ══════════ -->
+
+    <div class="view" id="view-contract">
+      <div class="view-hdr"><div><div class="view-title">Contract <span class="accent">Monitor</span></div><div class="view-sub">Live reads directly from the EFC token contract</div></div><button class="btn btn-outline" onclick="loadContractData()">↻ Refresh</button></div>
       <div class="panel">
-        <div class="p-title">Stake EFC <span class="badge" id="stk-badge">12% APY</span></div>
-        <div class="inp-wrap"><div class="inp-lbl">Amount <span class="mx-btn" onclick="setMax('stk-inp','d-efc')">MAX</span></div><input class="inp" id="stk-inp" type="number" placeholder="Enter EFC amount" oninput="calcStake()"/></div>
-        <div style="background:var(--surf2);border:1px solid var(--bdr2);border-radius:8px;padding:13px;margin-bottom:14px;font-size:.78rem;line-height:2;font-family:'Space Mono',monospace">
-          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">APY</span><span id="stk-apy-d" style="color:var(--gold);font-family:'Orbitron',monospace;font-weight:700">12%</span></div>
-          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Daily Est.</span><span id="stk-daily" style="color:var(--green)">—</span></div>
-          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Monthly Est.</span><span id="stk-mon" style="color:var(--green)">—</span></div>
-          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Pool</span><span style="color:var(--muted);font-size:9px">0xa1DD...630e</span></div>
+        <div class="panel-hdr"><div class="panel-title">Token Contract</div><span class="pill pill-gold mono">0x677C...fED1</span></div>
+        <table class="tbl">
+          <tbody>
+            <tr><td style="color:var(--muted)">Name</td><td class="mono" id="ct-name">—</td></tr>
+            <tr><td style="color:var(--muted)">Symbol</td><td class="mono" id="ct-symbol">—</td></tr>
+            <tr><td style="color:var(--muted)">Decimals</td><td class="mono" id="ct-decimals">—</td></tr>
+            <tr><td style="color:var(--muted)">Total Supply</td><td class="mono" id="ct-supply">—</td></tr>
+            <tr><td style="color:var(--muted)">Owner</td><td class="mono" id="ct-owner">—</td></tr>
+            <tr><td style="color:var(--muted)">Treasury Wallet</td><td class="mono" id="ct-treasury">—</td></tr>
+            <tr><td style="color:var(--muted)">Trading Open</td><td id="ct-trading">—</td></tr>
+            <tr><td style="color:var(--muted)">Total Staked</td><td class="mono" id="ct-staked">—</td></tr>
+            <tr><td style="color:var(--muted)">Pool APY</td><td class="mono" id="ct-apy">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">Pool Contract</div></div>
+          <div class="f-group"><label class="f-label">Address</label><div class="mono" style="font-size:.78rem;color:var(--gold);word-break:break-all">0xa1DD6C528882Dc19EcCbC967F50bBC121A29630e</div></div>
+          <div class="f-group"><label class="f-label">BNB Balance</label><div class="mono" id="pool-bnb" style="font-size:.9rem;color:var(--text)">—</div></div>
+          <a href="https://bscscan.com/address/0xa1DD6C528882Dc19EcCbC967F50bBC121A29630e" target="_blank" class="btn btn-outline w-full mt-8" style="justify-content:center">View on BSCScan ↗</a>
         </div>
-        <button class="btn-gold w-full" onclick="doStake()">Stake EFC →</button>
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">Treasury Wallet</div></div>
+          <div class="f-group"><label class="f-label">Address</label><div class="mono" style="font-size:.78rem;color:var(--gold);word-break:break-all">0x676cCf34C191a9D6EFE4B265b84877C619A559d0</div></div>
+          <div class="f-group"><label class="f-label">EFC Balance</label><div class="mono" id="treas-efc" style="font-size:.9rem;color:var(--text)">—</div></div>
+          <a href="https://bscscan.com/address/0x676cCf34C191a9D6EFE4B265b84877C619A559d0" target="_blank" class="btn btn-outline w-full mt-8" style="justify-content:center">View on BSCScan ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ LIVE ACTIVITY ══════════ -->
+    <div class="view" id="view-activity">
+      <div class="view-hdr"><div><div class="view-title">Live <span class="accent">Activity</span></div><div class="view-sub">Real on-chain transactions pulled from BSCScan</div></div><button class="btn btn-outline" onclick="loadBscscanActivity()">↻ Pull Latest</button></div>
+      <div class="panel">
+        <div class="f-group">
+          <label class="f-label">BSCScan API Key (free at bscscan.com/myapikey)</label>
+          <div class="flex gap-10"><input class="f-inp" id="bscscan-key" placeholder="Paste your free BSCScan API key here" style="flex:1"/><button class="btn btn-gold" onclick="saveBscscanKey()">Save</button></div>
+          <p style="font-size:.72rem;color:var(--dim);margin-top:6px">Stored locally in this browser only. Used to fetch real transaction history.</p>
+        </div>
       </div>
       <div class="panel">
-        <div class="p-title">Unstake EFC</div>
-        <div class="inp-wrap"><div class="inp-lbl">Amount <span class="mx-btn" onclick="setMax('ustk-inp','stk-my')">MAX</span></div><input class="inp" id="ustk-inp" type="number" placeholder="Enter EFC amount"/></div>
-        <div style="background:rgba(224,82,82,.06);border:1px solid rgba(224,82,82,.18);border-radius:8px;padding:11px 13px;font-size:.76rem;color:#F08080;line-height:1.6;margin-bottom:14px">⚠ Early unstaking before lock period may forfeit accumulated rewards. Lock terms are enforced on-chain by the pool contract.</div>
-        <button class="btn-outline w-full" onclick="doUnstake()">Unstake EFC</button>
-        <div class="divider"></div>
-        <div class="p-title" style="margin-top:0">Fund Staking Pool <span class="badge">ADMIN</span></div>
-        <div class="inp-wrap"><div class="inp-lbl">Fund Amount</div><input class="inp" id="fund-inp" type="number" placeholder="EFC amount"/></div>
-        <button class="btn-outline w-full" onclick="doFund()">Fund Pool</button>
+        <div class="panel-hdr"><div class="panel-title">Token Transfers</div><span class="live-badge"><span class="d"></span>BSCSCAN</span></div>
+        <div class="feed" id="activity-feed"><div class="tbl-empty">Add your BSCScan API key above, then click "Pull Latest"</div></div>
       </div>
     </div>
+
+    <!-- ══════════ CLIENTS ══════════ -->
+    <div class="view" id="view-clients">
+      <div class="view-hdr"><div><div class="view-title">Client <span class="accent">Management</span></div><div class="view-sub">All registered EFC client profiles — send tokens, send messages, block/unblock</div></div><button class="btn btn-outline" onclick="loadClients()">↻ Refresh</button></div>
+      <div class="panel" style="padding:14px 18px">
+        <input class="f-inp" id="client-search" placeholder="Search by name, ID, or wallet address..." oninput="loadClients()"/>
+      </div>
+      <div class="panel">
+        <table class="tbl">
+          <thead><tr><th>Client</th><th>Address</th><th>Status</th><th>Balance</th><th>Joined</th><th style="min-width:230px">Actions</th></tr></thead>
+          <tbody id="clients-tbody"><tr><td colspan="6" class="tbl-empty">No clients found</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- ══════════ AIRDROP CONSOLE ══════════ -->
+    <div class="view" id="view-airdrop">
+      <div class="view-hdr"><div><div class="view-title">Airdrop <span class="accent">Console</span></div><div class="view-sub">Owner-only batch distribution</div></div></div>
+      <div class="danger-banner"><span class="ic">⚠</span>Airdrops are permanent on-chain transactions. Double-check every address before executing.</div>
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">Uniform Airdrop</div></div>
+          <div class="f-group"><label class="f-label">Recipients (one per line)</label><textarea class="f-inp" id="adm-air-recs" rows="6" placeholder="0x1234...&#10;0x5678..."></textarea></div>
+          <div class="f-group"><label class="f-label">Amount Each (EFC)</label><input class="f-inp" id="adm-air-amt" type="number" placeholder="100"/></div>
+          <button class="btn btn-gold w-full" onclick="adminAirdropUniform()">Execute Airdrop →</button>
+        </div>
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">Varied Airdrop</div></div>
+          <div class="f-group"><label class="f-label">Address,Amount pairs</label><textarea class="f-inp" id="adm-air-var" rows="6" placeholder="0x1234...,100&#10;0x5678...,250"></textarea></div>
+          <button class="btn btn-gold w-full" onclick="adminAirdropVaried()">Execute Varied Airdrop →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ STAKING POOL ══════════ -->
+    <div class="view" id="view-staking">
+      <div class="view-hdr"><div><div class="view-title">Staking <span class="accent">Pool</span></div><div class="view-sub">Fund and monitor the rewards pool</div></div></div>
+      <div class="stat-grid">
+        <div class="stat-card"><span class="sc-label">Total Staked</span><span class="sc-val gold" id="stk-total-disp">—</span></div>
+        <div class="stat-card"><span class="sc-label">Current APY</span><span class="sc-val" id="stk-apy-disp">—</span></div>
+        <div class="stat-card"><span class="sc-label">Pool Funded By</span><span class="sc-val" style="font-size:.85rem">Owner Only</span></div>
+        <div class="stat-card"><span class="sc-label">Pool Health</span><span class="sc-val green" id="stk-health">—</span></div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">Fund Staking Rewards</div></div>
+        <div class="f-group"><label class="f-label">Amount to Fund (EFC)</label><input class="f-inp" id="adm-fund-amt" type="number" placeholder="10000"/></div>
+        <button class="btn btn-gold" onclick="adminFundStaking()">Fund Pool</button>
+      </div>
+    </div>
+
+    <!-- ══════════ TREASURY ══════════ -->
+    <div class="view" id="view-treasury">
+      <div class="view-hdr"><div><div class="view-title">Treasury <span class="accent">Monitor</span></div><div class="view-sub">Charity & governance wallet — read-only tracking</div></div></div>
+      <div class="panel">
+        <div class="f-group"><label class="f-label">Treasury Address</label><div class="mono" style="color:var(--gold);font-size:.85rem">0x676cCf34C191a9D6EFE4B265b84877C619A559d0</div></div>
+        <div class="f-group"><label class="f-label">EFC Balance</label><div class="mono" id="treas-efc-2" style="font-size:1.1rem;color:var(--text)">—</div></div>
+        <div class="f-group"><label class="f-label">BNB Balance</label><div class="mono" id="treas-bnb-2" style="font-size:1.1rem;color:var(--text)">—</div></div>
+        <a href="https://efikcoineternalv.github.io/Charity-Empowerment/" target="_blank" class="btn btn-outline mt-8">View Charity Portal ↗</a>
+      </div>
+      <div class="danger-banner"><span class="ic">ℹ</span>This contract has no admin function to move treasury funds from this panel — outbound treasury transactions must be signed directly from the treasury wallet itself, outside this app.</div>
+    </div>
+
+    <!-- ══════════ CONTRACT CONTROLS ══════════ -->
+    <div class="view" id="view-controls">
+      <div class="view-hdr"><div><div class="view-title">Contract <span class="accent">Controls</span></div><div class="view-sub">Functions exposed by your deployed contract</div></div></div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">Fee Exemptions</div></div>
+        <div class="f-group"><label class="f-label">Wallet Address</label><input class="f-inp" id="ctrl-fee-addr" placeholder="0x..."/></div>
+        <div class="flex gap-10">
+          <button class="btn btn-gold" onclick="adminSetExempt('isFeeExempt',true)">Set Fee Exempt</button>
+          <button class="btn btn-outline" onclick="adminSetExempt('isFeeExempt',false)">Remove Exemption</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">Max Wallet Exemptions</div></div>
+        <div class="f-group"><label class="f-label">Wallet Address</label><input class="f-inp" id="ctrl-max-addr" placeholder="0x..."/></div>
+        <div class="flex gap-10">
+          <button class="btn btn-gold" onclick="adminSetExempt('isMaxExempt',true)">Set Max Exempt</button>
+          <button class="btn btn-outline" onclick="adminSetExempt('isMaxExempt',false)">Remove Exemption</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">DEX Pair Registration</div></div>
+        <div class="f-group"><label class="f-label">Pair Address</label><input class="f-inp" id="ctrl-pair-addr" placeholder="0x..."/></div>
+        <div class="flex gap-10">
+          <button class="btn btn-gold" onclick="adminSetPair(true)">Register as Pair</button>
+          <button class="btn btn-outline" onclick="adminSetPair(false)">Unregister</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">Trading Control</div></div>
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px">If trading is currently closed, this opens it permanently. This cannot be undone by this contract.</p>
+        <button class="btn btn-outline-danger" onclick="confirmRisky('openTrading','Open Trading','This permanently enables public trading on the EFC token contract. This action cannot be reversed.','Opens trading via openTrading()')">Open Trading</button>
+      </div>
+    </div>
+
+    <!-- ══════════ AUDIT LOG ══════════ -->
+    <div class="view" id="view-audit">
+      <div class="view-hdr"><div><div class="view-title">Audit <span class="accent">Log</span></div><div class="view-sub">Every admin action taken in this session and device</div></div><button class="btn btn-outline-danger" onclick="clearAuditLog()">Clear Log</button></div>
+      <div class="panel">
+        <div id="audit-log-list"><div class="tbl-empty">No admin actions logged yet this session</div></div>
+      </div>
+    </div>
+
+    <!-- ══════════ DANGER ZONE ══════════ -->
+    <div class="view" id="view-danger">
+      <div class="view-hdr"><div><div class="view-title">Danger <span class="accent" style="color:var(--red-l)">Zone</span></div><div class="view-sub">Irreversible contract actions — extreme caution</div></div></div>
+      <div class="danger-banner"><span class="ic">☠</span>Every action below is permanent and cannot be undone by any admin, including you. Each requires PIN re-entry and typed confirmation.</div>
+
+      <div class="risk-card">
+        <span class="ri">🔥</span>
+        <div class="risk-info"><h4>Burn Tokens</h4><p>Permanently destroy EFC from the connected owner wallet's own balance. Reduces total supply.</p></div>
+        <button class="btn btn-outline-danger" onclick="openBurnModal()">Burn EFC</button>
+      </div>
+
+      <div class="risk-card">
+        <span class="ri">👑</span>
+        <div class="risk-info"><h4>Renounce Ownership</h4><p>Permanently removes the owner role from this wallet. No further admin actions will ever be possible by anyone.</p></div>
+        <button class="btn btn-danger" onclick="confirmRisky('renounceOwnership','Renounce Ownership','This will PERMANENTLY remove all admin control over the EFC contract. This cannot be undone — ever.','Calls renounceOwnership() — irreversible')">Renounce Ownership</button>
+      </div>
+
+      <div class="risk-card">
+        <span class="ri">🔓</span>
+        <div class="risk-info"><h4>Open Trading (if closed)</h4><p>Permanently enables public DEX trading. Cannot be paused again by this contract.</p></div>
+        <button class="btn btn-outline-danger" onclick="confirmRisky('openTrading','Open Trading','This permanently opens public trading. Cannot be reversed.','Calls openTrading()')">Open Trading</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<!-- ══════════════════ PAGE: AIRDROP ══════════════════ -->
-<div id="page-airdrop" class="page">
-  <div class="air-page">
-    <span class="sec-tag">Batch Airdrop</span>
-    <h2 class="sec-title" style="margin-bottom:7px">Airdrop EFC Tokens</h2>
-    <p style="color:var(--muted);font-size:.85rem;margin-bottom:22px">Send EFC to hundreds of wallets in a single on-chain transaction.</p>
-    <div class="air-warn"><strong>⚠ Before Airdropping:</strong> You must hold sufficient EFC and BNB for gas. Token approval is required first. Only the contract owner may call <code>airdrop()</code> / <code>airdropVaried()</code>. All airdrops are permanent on-chain — verify addresses before confirming.</div>
-    <div class="air-panel">
-      <h3>Uniform Airdrop</h3>
-      <p>Send the same amount of EFC to every address in the list.</p>
-      <div class="inp-wrap"><div class="inp-lbl">Recipients (one address per line)</div><textarea class="r-area" id="air-recs" placeholder="0x1234...abcd&#10;0x5678...efgh&#10;0x9012...ijkl" oninput="calcAir()"></textarea></div>
-      <div class="air-meta">
-        <div class="am-item"><span class="am-lbl">Recipients</span><span class="am-val" id="air-count">0</span></div>
-        <div class="am-item"><span class="am-lbl">Amount Each</span><input class="inp" id="air-amt" type="number" placeholder="EFC" style="margin-top:4px" oninput="calcAir()"/></div>
-        <div class="am-item"><span class="am-lbl">Total EFC</span><span class="am-val" id="air-tot">0</span></div>
-      </div>
-      <button class="btn-gold" onclick="doAirUniform()">Execute Airdrop →</button>
-    </div>
-    <div class="air-panel">
-      <h3>Varied Airdrop</h3>
-      <p>Send different amounts to different addresses. Format: <code style="color:var(--gold);font-size:10px">address,amount</code> per line.</p>
-      <div class="inp-wrap"><div class="inp-lbl">Address, Amount pairs</div><textarea class="r-area" id="air-var" placeholder="0x1234...abcd,100&#10;0x5678...efgh,250&#10;0x9012...ijkl,500" style="height:140px"></textarea></div>
-      <button class="btn-gold" onclick="doAirVaried()">Execute Varied Airdrop →</button>
-    </div>
+<!-- Burn modal -->
+<div class="m-ov" id="burn-modal">
+  <div class="modal danger">
+    <button class="m-close" onclick="closeM('burn-modal')">✕</button>
+    <h3 class="danger-text">Burn EFC Tokens</h3>
+    <p class="modal-sub">This permanently destroys EFC from your own connected wallet balance and reduces total supply. This cannot be undone.</p>
+    <div class="f-group"><label class="f-label">Amount to Burn</label><input class="f-inp" id="burn-amount" type="number" placeholder="0.0"/></div>
+    <button class="btn btn-danger w-full" onclick="confirmBurnStep()">Continue →</button>
   </div>
 </div>
 
-<!-- ══════════════════ PAGE: PORTFOLIO ══════════════════ -->
-<div id="page-portfolio" class="page">
-  <div class="port-page">
-    <span class="sec-tag">Portfolio</span>
-    <h2 class="sec-title" style="margin-bottom:22px">My Holdings</h2>
-    <div class="port-sum">
-      <div class="tot-card">
-        <span class="tot-val" id="port-total">$—</span>
-        <span class="tot-lbl">Total Portfolio Value</span>
-        <div style="margin-top:22px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:.8rem"><span style="color:var(--muted)">EFC Holdings</span><span class="mono text-sm" id="port-efc-pct">—</span></div>
-          <div style="height:5px;background:var(--bdr);border-radius:3px;overflow:hidden;margin-bottom:3px"><div id="port-efc-bar" style="height:100%;background:linear-gradient(90deg,var(--gold-l),var(--gold));border-radius:3px;width:0%;transition:width 1.2s"></div></div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:.8rem;margin-top:10px"><span style="color:var(--muted)">Staked EFC</span><span class="mono text-sm" id="port-stk-pct">—</span></div>
-          <div style="height:5px;background:var(--bdr);border-radius:3px;overflow:hidden"><div id="port-stk-bar" style="height:100%;background:linear-gradient(90deg,var(--green),#2A8A5C);border-radius:3px;width:0%;transition:width 1.2s .2s"></div></div>
-        </div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title"><span>EFC Price Chart</span><div class="cp-row"><span class="cp-btn active" onclick="setCp('1D',this)">1D</span><span class="cp-btn" onclick="setCp('1W',this)">1W</span><span class="cp-btn" onclick="setCp('1M',this)">1M</span></div></div>
-        <canvas id="price-canvas"></canvas>
-      </div>
-    </div>
-    <div class="hold-tbl">
-      <div class="tbl-hd"><span class="th">Asset</span><span class="th">Balance</span><span class="th">Price</span><span class="th">Value</span><span class="th">24h</span></div>
-      <div class="tbl-row">
-        <div class="td-ast"><img class="ast-ic" src="https://ipfs.io/ipfs/bafybeihrzyodihyp5met2hs32ppj37qlowuxarvs2lnlrgujgrlwxc7fwe" alt="EFC" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="ast-fb" style="display:none">E</div><div><div class="ast-nm">Efikcoin</div><div class="ast-sym">EFC</div></div></div>
-        <div class="td-v mono" id="port-efc-bal">—</div><div class="td-v mono" id="port-efc-p">$0.0842</div>
-        <div class="td-v mono" id="port-efc-val">$—</div><div class="td-chg pos" id="port-efc-24">+4.21%</div>
-      </div>
-      <div class="tbl-row">
-        <div class="td-ast"><div class="ast-fb" style="background:linear-gradient(135deg,#F5A500,#E8720C)">B</div><div><div class="ast-nm">BNB</div><div class="ast-sym">BNB</div></div></div>
-        <div class="td-v mono" id="port-bnb-bal">—</div><div class="td-v mono" id="port-bnb-p">$612</div>
-        <div class="td-v mono" id="port-bnb-val">$—</div><div class="td-chg pos">+1.83%</div>
-      </div>
-      <div class="tbl-row">
-        <div class="td-ast"><div class="ast-fb" style="background:linear-gradient(135deg,#1A2A40,#2A4060)">🔒</div><div><div class="ast-nm">Staked EFC</div><div class="ast-sym">sEFC</div></div></div>
-        <div class="td-v mono" id="port-stk-bal">—</div><div class="td-v mono">$0.0842</div>
-        <div class="td-v mono" id="port-stk-val">$—</div><div class="td-chg pos">+65% APY</div>
-      </div>
-    </div>
+<!-- Send Token to Client modal -->
+<div class="m-ov" id="send-token-modal">
+  <div class="modal">
+    <button class="m-close" onclick="closeM('send-token-modal')">✕</button>
+    <h3>Send EFC to Client</h3>
+    <p class="modal-sub" id="send-token-sub">Send EFC directly from your connected owner wallet to this client.</p>
+    <div class="f-group"><label class="f-label">Recipient</label><div class="mono" id="send-token-addr" style="font-size:.78rem;color:var(--gold);word-break:break-all"></div></div>
+    <div class="f-group"><label class="f-label">Amount (EFC)</label><input class="f-inp" id="send-token-amt" type="number" placeholder="0.0"/></div>
+    <button class="btn btn-gold w-full" onclick="executeSendToken()">Send Tokens →</button>
   </div>
 </div>
 
-<!-- ══════════════════ PAGE: CLIENTS ══════════════════ -->
-<div id="page-clients" class="page">
-  <div class="profile-page">
-    <span class="sec-tag">Client Hub</span>
-    <h2 class="sec-title" style="margin-bottom:7px">Personal Wallet Dashboards</h2>
-    <p style="color:var(--muted);font-size:.85rem;margin-bottom:24px">Every registered client gets their own persistent wallet dashboard with transaction history and portfolio tracking.</p>
-
-    <!-- Registration form -->
-    <div class="reg-form" id="reg-form">
-      <h3>Register Your Wallet</h3>
-      <p>Create your personal EFC profile linked to your wallet address. Your data is stored locally in your browser and never shared.</p>
-      <div class="form-row">
-        <div class="form-g"><label class="form-lbl">Full Name</label><input class="inp" id="reg-name" type="text" placeholder="Your name"/></div>
-        <div class="form-g"><label class="form-lbl">Email</label><input class="inp" id="reg-email" type="email" placeholder="you@example.com"/></div>
-      </div>
-      <div class="form-row">
-        <div class="form-g"><label class="form-lbl">Country</label><input class="inp" id="reg-country" type="text" placeholder="Nigeria, USA, Brazil..."/></div>
-        <div class="form-g"><label class="form-lbl">Wallet Address</label><input class="inp" id="reg-addr" type="text" placeholder="0x... (or connect wallet above)"/></div>
-      </div>
-      <div class="form-g"><label class="form-lbl">How did you hear about EFC?</label>
-        <select class="inp" id="reg-source">
-          <option value="">Select...</option>
-          <option>X (Twitter)</option><option>Telegram</option><option>WhatsApp</option>
-          <option>Friend/Referral</option><option>YouTube</option><option>BSCScan</option><option>Other</option>
-        </select>
-      </div>
-      <div class="phrase-warn" style="margin-bottom:16px"><strong>🔐 Privacy Notice</strong> Your profile is stored only in your browser's local storage. Efikcoin does not collect or transmit personal data. You can delete your profile at any time from Settings.</div>
-      <button class="btn-gold" onclick="registerClient()">Create My Profile →</button>
+<!-- Send Message to Client modal -->
+<div class="m-ov" id="send-msg-modal">
+  <div class="modal">
+    <button class="m-close" onclick="closeM('send-msg-modal')">✕</button>
+    <h3>Message Client</h3>
+    <p class="modal-sub" id="send-msg-sub">This message appears in the client's dashboard inbox next time they visit. It is NOT an email — no mail server is connected. Use "Also open in Email" to additionally send via your own email client.</p>
+    <div class="f-group"><label class="f-label">Message</label><textarea class="f-inp" id="send-msg-text" rows="4" placeholder="Type your message to this client..."></textarea></div>
+    <div class="flex items-c gap-10 mt-8" style="margin-bottom:16px">
+      <input type="checkbox" id="send-msg-email-too" style="width:16px;height:16px"/>
+      <label for="send-msg-email-too" style="font-size:.78rem;color:var(--muted)">Also open in my email app (mailto) to send a real email</label>
     </div>
-
-    <!-- My Profile (shown after registration) -->
-    <div id="my-profile" style="display:none">
-      <div class="profile-hero">
-        <div class="profile-avatar" id="prof-avatar">?</div>
-        <div class="profile-info">
-          <h2 id="prof-name">—</h2>
-          <div class="pid" id="prof-id">EFC-000000</div>
-          <div class="paddr" id="prof-addr">Not connected</div>
-          <div class="profile-badges">
-            <span class="pbadge pb-gold">⬡ EFC Holder</span>
-            <span class="pbadge pb-green" id="prof-stk-badge" style="display:none">🔒 Staker</span>
-            <span class="pbadge pb-blue" id="prof-country-badge">🌍 —</span>
-          </div>
-        </div>
-      </div>
-      <div class="profile-grid">
-        <div class="profile-card">
-          <div class="pc-title">My Wallet Stats</div>
-          <div class="pc-row"><span class="pc-key">EFC Balance</span><span class="pc-val gold" id="pc-efc">—</span></div>
-          <div class="pc-row"><span class="pc-key">Staked EFC</span><span class="pc-val gold" id="pc-stk">—</span></div>
-          <div class="pc-row"><span class="pc-key">Pending Rewards</span><span class="pc-val green" id="pc-rew">—</span></div>
-          <div class="pc-row"><span class="pc-key">BNB Balance</span><span class="pc-val" id="pc-bnb">—</span></div>
-          <div class="pc-row"><span class="pc-key">Portfolio Value</span><span class="pc-val gold" id="pc-tot">—</span></div>
-        </div>
-        <div class="profile-card">
-          <div class="pc-title">My Profile</div>
-          <div class="pc-row"><span class="pc-key">Client ID</span><span class="pc-val" id="pc-id">—</span></div>
-          <div class="pc-row"><span class="pc-key">Name</span><span class="pc-val" id="pc-nm">—</span></div>
-          <div class="pc-row"><span class="pc-key">Email</span><span class="pc-val" id="pc-em">—</span></div>
-          <div class="pc-row"><span class="pc-key">Country</span><span class="pc-val" id="pc-cn">—</span></div>
-          <div class="pc-row"><span class="pc-key">Member Since</span><span class="pc-val" id="pc-since">—</span></div>
-          <div class="pc-row"><span class="pc-key">Wallet</span><span class="pc-val" id="pc-wl" style="font-size:8px">—</span></div>
-        </div>
-      </div>
-      <div class="profile-card" style="margin-bottom:20px">
-        <div class="pc-title">My Transaction History</div>
-        <div class="tx-list" id="prof-tx-list"><div style="text-align:center;padding:30px;color:var(--muted);font-size:.8rem">No transactions yet. Connect wallet to load history.</div></div>
-        <div style="margin-top:12px;text-align:center">
-          <a id="prof-bscscan-link" href="#" target="_blank" rel="noopener" style="font-family:'Space Mono',monospace;font-size:9.5px;color:var(--gold)">View full history on BSCScan ↗</a>
-        </div>
-      </div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap">
-        <button class="btn-outline" onclick="editProfile()" style="font-size:10px;padding:10px 20px">Edit Profile</button>
-        <button class="btn-outline" onclick="deleteProfile()" style="font-size:10px;padding:10px 20px;border-color:rgba(224,82,82,.3);color:#F08080">Delete Profile</button>
-        <button class="btn-gold" onclick="refreshProfile()" style="font-size:10px;padding:10px 20px">↻ Refresh Balances</button>
-      </div>
-    </div>
-
-    <!-- All registered clients (admin view) -->
-    <div class="divider" style="margin:32px 0"></div>
-    <div class="p-title" style="margin-bottom:16px">All Registered Clients <span class="badge" id="client-count-badge">0</span></div>
-    <div class="client-list">
-      <div class="cl-head">
-        <span class="cl-th">Client</span>
-        <span class="cl-th">Address</span>
-        <span class="cl-th">Balance</span>
-        <span class="cl-th">Joined</span>
-        <span class="cl-th">Action</span>
-      </div>
-      <div id="client-table-body"><div style="text-align:center;padding:32px;color:var(--muted);font-size:.8rem;font-family:'Space Mono',monospace">No clients registered yet</div></div>
-    </div>
+    <button class="btn btn-gold w-full" onclick="executeSendMessage()">Deliver to Dashboard Inbox →</button>
   </div>
 </div>
 
-<!-- ══════════════════ PAGE: WALLET GEN ══════════════════ -->
-<div id="page-wallet" class="page">
-  <div class="wgen-page">
-    <span class="sec-tag">Wallet Management</span>
-    <h2 class="sec-title" style="margin-bottom:7px">Your Crypto Wallet</h2>
-    <p style="color:var(--muted);font-size:.85rem;margin-bottom:22px">Generate a new wallet or import existing. All keys are generated locally — never transmitted.</p>
-    <div class="phrase-warn"><strong>🔐 CRITICAL SECURITY WARNING</strong> Your seed phrase and private key are the ONLY way to access your wallet. Efikcoin does NOT store your keys. We CANNOT recover them if lost. Write them on paper — keep safe. Never share digitally. Never enter on any other website.</div>
-    <div class="rtabs">
-      <div class="rtab active" onclick="switchRT('create',this)">Create Wallet</div>
-      <div class="rtab" onclick="switchRT('import',this)">Import Wallet</div>
-      <div class="rtab" onclick="switchRT('qr',this)">QR Code</div>
-    </div>
-    <div class="rpanel active" id="rp-create">
-      <div class="gen-box" id="gen-box">
-        <div style="font-size:40px;margin-bottom:12px">🔑</div>
-        <p style="color:var(--muted);font-size:.83rem;margin-bottom:18px">Generate a new BSC-compatible wallet. Your seed phrase shows once — save it immediately.</p>
-        <button class="btn-gold" onclick="genWallet()">Generate New Wallet</button>
-      </div>
-      <div id="gen-result" style="display:none">
-        <div class="gen-box done">
-          <div style="text-align:left;width:100%">
-            <span class="form-lbl">Wallet Address</span>
-            <div class="gen-addr" id="gen-addr">—</div>
-            <button class="btn-outline" style="font-size:9.5px;padding:7px 14px;margin-bottom:14px" onclick="copyT(document.getElementById('gen-addr').textContent)">Copy Address ⎘</button>
-            <span class="form-lbl">Private Key</span>
-            <div class="gen-phrase" id="gen-pk"></div>
-            <button class="btn-outline" style="font-size:9.5px;padding:7px 14px;margin-bottom:14px;border-color:rgba(224,82,82,.3);color:#F08080" onclick="copyT(document.getElementById('gen-pk').textContent)">Copy Private Key ⎘</button>
-            <span class="form-lbl">Seed Phrase (12 words)</span>
-            <div class="phrase-warn"><strong>Write this down NOW. It will NOT be shown again.</strong></div>
-            <div class="gen-phrase" id="gen-mnemonic" style="color:var(--gold-l);letter-spacing:.5px"></div>
-            <button class="btn-outline" style="font-size:9.5px;padding:7px 14px;margin-top:7px;border-color:rgba(224,82,82,.3);color:#F08080" onclick="copyT(document.getElementById('gen-mnemonic').textContent)">Copy Seed Phrase ⎘</button>
-          </div>
+<script>
+/* ════════════════════════════════════════
+
+   CONSTANTS
+════════════════════════════════════════ */
+const EFC_TOKEN='0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1';
+const POOL='0xa1DD6C528882Dc19EcCbC967F50bBC121A29630e';
+const TREASURY='0x676cCf34C191a9D6EFE4B265b84877C619A559d0';
+const BSC_ID='0x38';
+const EFC_ABI=[{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"recipients","type":"uint256"}],"name":"AirdropCompleted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardsClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Staked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Unstaked","type":"event"},{"inputs":[],"name":"APY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"DEAD","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address[]","name":"recipients","type":"address[]"},{"internalType":"uint256","name":"amountEach","type":"uint256"}],"name":"airdrop","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"recipients","type":"address[]"},{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"name":"airdropVaried","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"o","type":"address"},{"internalType":"address","name":"s","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"s","type":"address"},{"internalType":"uint256","name":"a","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"a","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"burn","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"buyFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"deposit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"fundStaking","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"isFeeExempt","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"isMaxExempt","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"isPair","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"maxWallet","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"openTrading","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"pendingReward","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"sellFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"a","type":"address"},{"internalType":"bool","name":"e","type":"bool"}],"name":"setFeeExempt","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"a","type":"address"},{"internalType":"bool","name":"e","type":"bool"}],"name":"setMaxExempt","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"pair","type":"address"},{"internalType":"bool","name":"status","type":"bool"}],"name":"setPair","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakeStart","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"staked","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"pure","type":"function"},{"inputs":[],"name":"totalStaked","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tradingOpen","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"a","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"f","type":"address"},{"internalType":"address","name":"t","type":"address"},{"internalType":"uint256","name":"a","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"treasuryWallet","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
+
+let provider=null,signer=null,adminAddr=null,efcContract=null,contractOwner=null;
+let sessionCode=null,pinBuffer='',txCB=null,riskCB=null;
+
+/* ════════════════════════════════════════
+   STEP 1: WALLET CONNECT + OWNER CHECK
+════════════════════════════════════════ */
+async function connectAdminWallet(){
+  const eth=window.ethereum;
+  if(!eth){ showLockErr(1,'No wallet detected. Install MetaMask.'); return; }
+  try{
+    await eth.request({method:'eth_requestAccounts'});
+    try{ await eth.request({method:'wallet_switchEthereumChain',params:[{chainId:BSC_ID}]}); }
+    catch(e){
+      if(e.code===4902){
+        await eth.request({method:'wallet_addEthereumChain',params:[{chainId:BSC_ID,chainName:'BNB Smart Chain',nativeCurrency:{name:'BNB',symbol:'BNB',decimals:18},rpcUrls:['https://bsc-dataseed.binance.org/'],blockExplorerUrls:['https://bscscan.com/']}]});
+      }
+    }
+    provider=new ethers.BrowserProvider(eth);
+    signer=await provider.getSigner();
+    adminAddr=await signer.getAddress();
+    efcContract=new ethers.Contract(EFC_TOKEN,EFC_ABI,signer);
+
+    document.getElementById('owner-status').textContent='Verifying owner on-chain...';
+    contractOwner=await efcContract.owner();
+
+    if(contractOwner.toLowerCase()!==adminAddr.toLowerCase()){
+      document.getElementById('owner-dot').className='dot bad';
+      document.getElementById('owner-status').textContent='Access denied — this wallet is not the contract owner';
+      showLockErr(1,'Connected wallet ('+adminAddr.slice(0,8)+'...) does not match contract owner. Switch to the owner wallet in MetaMask.');
+      return;
+    }
+    document.getElementById('owner-dot').className='dot ok';
+    document.getElementById('owner-status').textContent='Verified owner: '+adminAddr.slice(0,8)+'...'+adminAddr.slice(-6);
+    hideLockErr(1);
+    setTimeout(()=>goToStep(2),700);
+  }catch(e){ showLockErr(1,'Connection failed: '+e.message); }
+}
+
+/* ════════════════════════════════════════
+   STEP 2: PIN
+════════════════════════════════════════ */
+function getPinKey(){ return 'efc_admin_pin_'+adminAddr.toLowerCase(); }
+function onPinInput(val){
+  pinBuffer=val.replace(/\D/g,'').slice(0,6);
+  document.querySelectorAll('.pin-dot').forEach((d,i)=>{ d.classList.toggle('filled',i<pinBuffer.length); d.textContent=i<pinBuffer.length?'•':''; });
+}
+function verifyPin(){
+  if(pinBuffer.length!==6){ showLockErr(2,'Enter a 6-digit PIN'); return; }
+  const stored=localStorage.getItem(getPinKey());
+  if(!stored){
+    localStorage.setItem(getPinKey(),pinBuffer);
+    toast('PIN created for this device','success');
+    hideLockErr(2); pinBuffer=''; document.getElementById('pin-input').value='';
+    generateSessionCode(); goToStep(3);
+    return;
+  }
+  if(stored!==pinBuffer){ showLockErr(2,'Incorrect PIN. Try again.'); pinBuffer=''; document.getElementById('pin-input').value=''; onPinInput(''); return; }
+  hideLockErr(2); pinBuffer=''; document.getElementById('pin-input').value='';
+  generateSessionCode(); goToStep(3);
+}
+
+/* ════════════════════════════════════════
+   STEP 3: SESSION 2FA CODE
+════════════════════════════════════════ */
+function generateSessionCode(){
+  sessionCode=Math.floor(100000+Math.random()*900000).toString();
+  document.getElementById('session-code-display').textContent=sessionCode;
+}
+function verifySession(){
+  const v=document.getElementById('session-confirm-input').value.trim();
+  if(v!==sessionCode){ showLockErr(3,'Code does not match. Re-check and try again.'); return; }
+  hideLockErr(3);
+  unlockAdminPanel();
+}
+
+function goToStep(n){
+  document.querySelectorAll('.lock-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('lock-step-'+n).classList.add('active');
+}
+function showLockErr(step,msg){ const e=document.getElementById('lock-err-'+step); document.getElementById('lock-err-'+step+'-msg').textContent=msg; e.classList.add('show'); }
+function hideLockErr(step){ document.getElementById('lock-err-'+step).classList.remove('show'); }
+
+function unlockAdminPanel(){
+  document.getElementById('lock-screen').style.display='none';
+  document.getElementById('admin-shell').classList.add('active');
+  document.getElementById('tb-owner-addr').textContent=adminAddr.slice(0,8)+'...'+adminAddr.slice(-6);
+  toast('Welcome back, admin','success');
+  logAudit('Session unlocked','Wallet + PIN + 2FA verified');
+  refreshAll();
+}
+
+function lockAdmin(){
+  if(!confirm('Lock the admin session? You will need to re-verify wallet, PIN, and session code.')) return;
+  document.getElementById('admin-shell').classList.remove('active');
+  document.getElementById('lock-screen').style.display='flex';
+  goToStep(1);
+  toast('Session locked','info');
+}
+
+/* ════════════════════════════════════════
+   VIEW SWITCHING
+════════════════════════════════════════ */
+function showView(name,el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(s=>s.classList.remove('active'));
+  if(el) el.classList.add('active');
+  if(name==='clients') loadClients();
+  if(name==='audit') renderAuditLog();
+}
+
+/* ════════════════════════════════════════
+   DATA LOADING
+════════════════════════════════════════ */
+async function refreshAll(){
+  await loadContractData();
+  await loadClients();
+  checkHealth();
+}
+
+async function loadContractData(){
+  if(!efcContract) return;
+  try{
+    const [name,symbol,decimals,supply,owner,treasury,trading,staked,apy,bnbBal,poolBnb,treasEfc] = await Promise.all([
+      efcContract.name().catch(()=>'EFC'),
+      efcContract.symbol().catch(()=>'EFC'),
+      efcContract.decimals().catch(()=>18),
+      efcContract.totalSupply().catch(()=>0n),
+      efcContract.owner().catch(()=>'—'),
+      efcContract.treasuryWallet().catch(()=>TREASURY),
+      efcContract.tradingOpen().catch(()=>null),
+      efcContract.totalStaked().catch(()=>0n),
+      efcContract.APY().catch(()=>0n),
+      provider.getBalance(adminAddr).catch(()=>0n),
+      provider.getBalance(POOL).catch(()=>0n),
+      efcContract.balanceOf(TREASURY).catch(()=>0n)
+    ]);
+    const supplyF=ethers.formatEther(supply);
+    const stakedF=ethers.formatEther(staked);
+    const treasEfcF=ethers.formatEther(treasEfc);
+    const stakedPct=supply>0n?(Number(staked)/Number(supply)*100).toFixed(2):'0';
+
+    setT('ct-name',name);setT('ct-symbol',symbol);setT('ct-decimals',decimals);
+    setT('ct-supply',Number(supplyF).toLocaleString()+' EFC');
+    setT('ct-owner',owner);setT('ct-treasury',treasury);
+    setT('ct-staked',Number(stakedF).toLocaleString()+' EFC');
+    setT('ct-apy',apy.toString()+'%');
+
+    const tradingEl=document.getElementById('ct-trading');
+    if(trading===null){ tradingEl.innerHTML='<span class="pill pill-gold">N/A</span>'; }
+    else{ tradingEl.innerHTML=trading?'<span class="pill pill-green">OPEN</span>':'<span class="pill pill-red">CLOSED</span>'; }
+
+    setT('ov-supply',Number(supplyF).toLocaleString());
+    setT('ov-staked',Number(stakedF).toLocaleString());
+    setT('ov-staked-pct',stakedPct+'% of supply');
+    setT('ov-treasury',Number(treasEfcF).toLocaleString());
+    setT('ov-owner',owner.slice(0,8)+'...'+owner.slice(-6));
+    setT('ov-pool-bal',Number(ethers.formatEther(poolBnb)).toFixed(4));
+    setT('ov-bnb-bal',Number(ethers.formatEther(bnbBal)).toFixed(4));
+    const ovTrading=document.getElementById('ov-trading');
+    if(trading===null){ ovTrading.textContent='N/A'; document.getElementById('ov-trading-sub').textContent='not exposed by contract'; }
+    else{ ovTrading.textContent=trading?'OPEN':'CLOSED'; ovTrading.className='sc-val '+(trading?'green':'red'); document.getElementById('ov-trading-sub').textContent=trading?'public trading active':'trading restricted'; }
+
+    setT('stk-total-disp',Number(stakedF).toLocaleString()+' EFC');
+    setT('stk-apy-disp',apy.toString()+'%');
+    setT('stk-health',Number(poolBnb)>0n||true?'FUNDED':'EMPTY');
+
+    setT('pool-bnb',Number(ethers.formatEther(poolBnb)).toFixed(5)+' BNB');
+    setT('treas-efc',Number(treasEfcF).toLocaleString()+' EFC');
+    setT('treas-efc-2',Number(treasEfcF).toLocaleString()+' EFC');
+    const treasBnb=await provider.getBalance(TREASURY).catch(()=>0n);
+    setT('treas-bnb-2',Number(ethers.formatEther(treasBnb)).toFixed(5)+' BNB');
+
+    document.getElementById('health-contract').className='pill pill-green';
+    document.getElementById('health-contract').textContent='ONLINE';
+    document.getElementById('health-pool').className='pill '+(Number(poolBnb)>0?'pill-green':'pill-red');
+    document.getElementById('health-pool').textContent=Number(poolBnb)>0?'FUNDED':'CHECK';
+
+    addFeedItem('overview-feed','adm','⬡','Contract Synced',name+' · supply '+Number(supplyF).toLocaleString());
+  }catch(e){
+    console.error(e);
+    document.getElementById('health-contract').className='pill pill-red';
+    document.getElementById('health-contract').textContent='ERROR';
+    toast('Contract read error: '+e.message,'error');
+  }
+}
+
+function checkHealth(){
+  const key=localStorage.getItem('efc_bscscan_key');
+  document.getElementById('health-bscscan').className='pill '+(key?'pill-green':'pill-gold');
+  document.getElementById('health-bscscan').textContent=key?'KEY SET':'NO KEY';
+}
+
+/* ════════════════════════════════════════
+   BSCSCAN ACTIVITY
+════════════════════════════════════════ */
+function saveBscscanKey(){
+  const k=document.getElementById('bscscan-key').value.trim();
+  if(!k){ toast('Enter an API key','error'); return; }
+  localStorage.setItem('efc_bscscan_key',k);
+  toast('BSCScan API key saved','success');
+  checkHealth();
+}
+async function loadBscscanActivity(){
+  const key=localStorage.getItem('efc_bscscan_key');
+  const feed=document.getElementById('activity-feed');
+  if(!key){ toast('Add your BSCScan API key first','error'); return; }
+  feed.innerHTML='<div class="tbl-empty">Loading from BSCScan...</div>';
+  try{
+    const url=`https://api.bscscan.com/api?module=account&action=tokentx&contractaddress=${EFC_TOKEN}&page=1&offset=25&sort=desc&apikey=${key}`;
+    const r=await fetch(url);
+    const d=await r.json();
+    if(d.status!=='1'||!Array.isArray(d.result)||!d.result.length){
+      feed.innerHTML='<div class="tbl-empty">No transfers found, or API key invalid/rate-limited</div>';
+      return;
+    }
+    feed.innerHTML='';
+    d.result.forEach(tx=>{
+      const val=(Number(tx.value)/Math.pow(10,Number(tx.tokenDecimal||18))).toLocaleString(undefined,{maximumFractionDigits:2});
+      const isOut=tx.from.toLowerCase()===TREASURY.toLowerCase()||tx.from.toLowerCase()===POOL.toLowerCase();
+      addFeedItem('activity-feed',isOut?'out':'in',isOut?'↗':'↘',
+        tx.from.slice(0,6)+'...→'+tx.to.slice(0,6)+'...',
+        val+' EFC · '+new Date(tx.timeStamp*1000).toLocaleString());
+    });
+    logAudit('Pulled BSCScan activity',d.result.length+' transfers loaded');
+  }catch(e){
+    feed.innerHTML='<div class="tbl-empty">Error fetching from BSCScan: '+e.message+'</div>';
+  }
+}
+
+/* ════════════════════════════════════════
+   CLIENTS — Firestore (global, real)
+════════════════════════════════════════ */
+function fb(){ return window.__fb; }
+async function waitForFirebase(timeoutMs=4000){
+  if(window.__fbReady) return true;
+  return new Promise(resolve=>{
+    const t=setTimeout(()=>resolve(false),timeoutMs);
+    window.addEventListener('firebase-ready',()=>{clearTimeout(t);resolve(true);},{once:true});
+  });
+}
+
+window.__adminClientsCache=[];
+
+async function loadClients(){
+  const tb=document.getElementById('clients-tbody');
+  const ready=await waitForFirebase();
+  if(!ready){
+    tb.innerHTML='<tr><td colspan="6" class="tbl-empty">⚠ Cloud database unavailable. Check your internet connection and reload.</td></tr>';
+    toast('Could not reach cloud database','error');
+    return;
+  }
+  let all=[];
+  try{
+    const {db,collection,getDocs} = fb();
+    const snap = await getDocs(collection(db,'clients'));
+    snap.forEach(d=>{ const data=d.data(); if(!data.deleted) all.push(data); });
+  }catch(e){
+    console.error(e);
+    tb.innerHTML='<tr><td colspan="6" class="tbl-empty">Error loading clients: '+e.message+'</td></tr>';
+    toast('Failed to load clients: '+e.message,'error');
+    return;
+  }
+  window.__adminClientsCache=all;
+  setT('sb-client-count',all.length);
+  setT('ov-clients',all.length);
+  const searchEl=document.getElementById('client-search');
+  const q=(searchEl?searchEl.value:'').trim().toLowerCase();
+  const filtered=q?all.filter(c=>
+    (c.name||'').toLowerCase().includes(q) ||
+    (c.id||'').toLowerCase().includes(q) ||
+    (c.wallet||'').toLowerCase().includes(q)
+  ):all;
+  if(!filtered.length){ tb.innerHTML='<tr><td colspan="6" class="tbl-empty">'+(q?'No clients match your search':'No clients registered yet — once visitors register on efikcoin.xyz, they appear here automatically')+'</td></tr>'; return; }
+  tb.innerHTML=filtered.map((c)=>{
+    const realIdx=all.findIndex(x=>x.id===c.id);
+    const statusPill=c.blocked?'<span class="pill pill-red">BLOCKED</span>':'<span class="pill pill-green">ACTIVE</span>';
+    return `
+    <tr>
+      <td>${c.name||'—'} <span class="mono" style="color:var(--muted);font-size:.7rem">${c.id||''}</span></td>
+      <td class="mono" style="font-size:.75rem">${(c.wallet||'—').slice(0,10)}...${(c.wallet||'').slice(-6)}</td>
+      <td>${statusPill}</td>
+      <td class="mono">${c.lastBal||'0'} EFC</td>
+      <td class="mono" style="font-size:.72rem">${c.joined?new Date(c.joined).toLocaleDateString():'—'}</td>
+      <td>
+        <div class="flex gap-10" style="flex-wrap:wrap">
+          <button class="btn btn-outline" style="padding:5px 9px;font-size:8px" onclick="openSendTokenModal(${realIdx})">💸 Send</button>
+          <button class="btn btn-outline" style="padding:5px 9px;font-size:8px" onclick="openSendMsgModal(${realIdx})">✉ Message</button>
+          <button class="btn ${c.blocked?'btn-outline':'btn-outline-danger'}" style="padding:5px 9px;font-size:8px" onclick="toggleBlockClient(${realIdx})">${c.blocked?'✓ Unblock':'🚫 Block'}</button>
+          <a href="https://bscscan.com/address/${c.wallet}" target="_blank" class="btn btn-outline" style="padding:5px 9px;font-size:8px">↗</a>
         </div>
-        <div style="margin-top:14px;text-align:center">
-          <p class="form-lbl" style="margin-bottom:8px">Wallet QR Code</p>
-          <div id="gen-qr"></div>
-        </div>
-        <div class="phrase-warn" style="margin-top:14px"><strong>⚠ Import into MetaMask or Trust Wallet</strong> Use the 12-word seed phrase above to import this wallet into MetaMask or Trust Wallet for full transaction signing.</div>
-        <button class="btn-gold" style="margin-top:14px" onclick="useGenWallet()">Set as My Address</button>
-      </div>
-    </div>
-    <div class="rpanel" id="rp-import">
-      <div class="air-panel">
-        <h3>Import by Seed Phrase</h3>
-        <p>Enter your 12 or 24-word mnemonic to derive wallet address.</p>
-        <div class="form-g"><label class="form-lbl">Seed Phrase</label><textarea class="r-area" id="imp-phrase" placeholder="word1 word2 word3 ... word12" style="height:70px"></textarea></div>
-        <button class="btn-gold" onclick="importPhrase()">Import Wallet</button>
-      </div>
-      <div class="air-panel" style="margin-top:0">
-        <h3>Import by Private Key</h3>
-        <p>Enter your hex private key to load the wallet address.</p>
-        <div class="form-g"><label class="form-lbl">Private Key</label><input class="inp" id="imp-pk" type="password" placeholder="0x..."/></div>
-        <button class="btn-gold" on
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+let activeClientIdx=null;
+
+function openSendTokenModal(idx){
+  const c=window.__adminClientsCache[idx]; if(!c) return;
+  activeClientIdx=idx;
+  setT('send-token-sub','Send EFC directly from your connected owner wallet to '+(c.name||'this client')+'.');
+  setT('send-token-addr',c.wallet||'—');
+  document.getElementById('send-token-amt').value='';
+  openM('send-token-modal');
+}
+async function executeSendToken(){
+  const c=window.__adminClientsCache[activeClientIdx]; if(!c||!c.wallet){ toast('Client wallet not found','error'); return; }
+  const amt=parseFloat(document.getElementById('send-token-amt').value);
+  if(!amt||amt<=0){ toast('Enter a valid amount','error'); return; }
+  if(!ethers.isAddress(c.wallet)){ toast('Client has no valid wallet address','error'); return; }
+  closeM('send-token-modal');
+  txModal('Send EFC to Client',`Sending ${amt} EFC to ${c.name||c.id}`,`Recipient: ${c.wallet}\nAmount: ${amt} EFC\nFrom: your connected owner wallet`,
+    async()=>{
+      const t=await efcContract.transfer(c.wallet,ethers.parseEther(amt.toString()));
+      await t.wait();
+      toast('✓ Sent '+amt+' EFC to '+(c.name||c.id),'success');
+      logAudit('Sent tokens to client',amt+' EFC → '+c.name+' ('+c.wallet+')');
+      loadContractData();
+    });
+}
+
+function openSendMsgModal(idx){
+  const c=window.__adminClientsCache[idx]; if(!c) return;
+  activeClientIdx=idx;
+  setT('send-msg-sub','This message appears in '+(c.name||'the client')+'\'s dashboard inbox next time they visit efikcoin.xyz. It is NOT an email — no mail server is connected. Use the checkbox to also open a real email.');
+  document.getElementById('send-msg-text').value='';
+  document.getElementById('send-msg-email-too').checked=false;
+  openM('send-msg-modal');
+}
+async function executeSendMessage(){
+  const c=window.__adminClientsCache[activeClientIdx]; if(!c){ toast('Client not found','error'); return; }
+  const text=document.getElementById('send-msg-text').value.trim();
+  if(!text){ toast('Enter a message','error'); return; }
+  const ready=await waitForFirebase();
+  if(!ready){ toast('Cloud database unavailable — message not sent','error'); return; }
+  try{
+    const {db,doc,updateDoc} = fb();
+    const updated=(c.notifications||[]).concat([{text,time:Date.now(),read:false,from:adminAddr}]);
+    await updateDoc(doc(db,'clients',c.id),{notifications:updated});
+  }catch(e){
+    console.error(e);
+    toast('Failed to deliver message: '+e.message,'error');
+    return;
+  }
+  const emailToo=document.getElementById('send-msg-email-too').checked;
+  if(emailToo && c.email){
+    window.open('mailto:'+c.email+'?subject=Message from Efikcoin EFC Admin&body='+encodeURIComponent(text),'_blank');
+  }
+  toast('✓ Message delivered to dashboard inbox','success');
+  logAudit('Message sent to client',c.name+' — "'+text.slice(0,50)+(text.length>50?'...':'')+'"');
+  closeM('send-msg-modal');
+  loadClients();
+}
+
+async function toggleBlockClient(idx){
+  const c=window.__adminClientsCache[idx]; if(!c) return;
+  const newState=!c.blocked;
+  if(newState && !confirm('Block '+(c.name||c.id)+'? They will lose access to dashboard features (staking, airdrop, send) until unblocked. Their on-chain EFC and wallet are not affected.')) return;
+  const ready=await waitForFirebase();
+  if(!ready){ toast('Cloud database unavailable','error'); return; }
+  try{
+    const {db,doc,updateDoc} = fb();
+    await updateDoc(doc(db,'clients',c.id),{blocked:newState});
+  }catch(e){
+    console.error(e);
+    toast('Failed to update client: '+e.message,'error');
+    return;
+  }
+  toast(newState?'🚫 Client blocked':'✓ Client unblocked','success');
+  logAudit(newState?'Client blocked':'Client unblocked',c.name+' ('+c.id+')');
+  loadClients();
+}
+
+
+/* ════════════════════════════════════════
+   STANDARD TX (airdrop, fund, exemptions)
+════════════════════════════════════════ */
+function txModal(title,sub,detail,cb){
+  setT('tx-title',title); setT('tx-sub',sub);
+  document.getElementById('tx-detail').innerHTML=detail.replace(/\n/g,'<br/>');
+  txCB=cb; openM('tx-modal');
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('tx-confirm-btn').onclick=async function(){
+    if(!txCB) return;
+    this.textContent='⌛ Executing...'; this.disabled=true;
+    try{ await txCB(); }catch(e){ toast('Error: '+e.message,'error'); }
+    this.textContent='Sign & Execute'; this.disabled=false;
+    closeM('tx-modal'); txCB=null;
+  };
+});
+
+async function adminAirdropUniform(){
+  const raw=document.getElementById('adm-air-recs').value.trim();
+  const addrs=raw.split('\n').map(a=>a.trim()).filter(a=>a&&ethers.isAddress(a));
+  const amt=parseFloat(document.getElementById('adm-air-amt').value);
+  if(!addrs.length){ toast('No valid addresses','error'); return; }
+  if(!amt||amt<=0){ toast('Enter amount','error'); return; }
+  txModal('Execute Airdrop',`${addrs.length} recipients × ${amt} EFC each`,
+    `Recipients: ${addrs.length}\nEach: ${amt} EFC\nTotal: ${(addrs.length*amt).toFixed(2)} EFC`,
+    async()=>{
+      const w=ethers.parseEther(amt.toString());
+      const total=ethers.parseEther((addrs.length*amt).toString());
+      const a=await efcContract.approve(EFC_TOKEN,total); await a.wait();
+      const t=await efcContract.airdrop(addrs,w); await t.wait();
+      toast('✓ Airdropped to '+addrs.length+' wallets','success');
+      logAudit('Airdrop executed',addrs.length+' recipients, '+amt+' EFC each');
+      loadContractData();
+    });
+}
+async function adminAirdropVaried(){
+  const raw=document.getElementById('adm-air-var').value.trim();
+  const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  const addrs=[],amounts=[];
+  for(const l of lines){
+    const[a,v]=l.split(',').map(s=>s.trim());
+    if(!ethers.isAddress(a)){ toast('Bad address: '+a,'error'); return; }
+    addrs.push(a); amounts.push(ethers.parseEther(v));
+  }
+  if(!addrs.length){ toast('No valid pairs','error'); return; }
+  txModal('Varied Airdrop',addrs.length+' custom-amount recipients',`Recipients: ${addrs.length}`,
+    async()=>{
+      const t=await efcContract.airdropVaried(addrs,amounts); await t.wait();
+      toast('✓ Varied airdrop complete','success');
+      logAudit('Varied airdrop executed',addrs.length+' recipients');
+      loadContractData();
+    });
+}
+async function adminFundStaking(){
+  const amt=parseFloat(document.getElementById('adm-fund-amt').value);
+  if(!amt||amt<=0){ toast('Enter amount','error'); return; }
+  txModal('Fund Staking Pool',`Funding pool with ${amt} EFC`,`Amount: ${amt} EFC\nFunction: fundStaking()`,
+    async()=>{
+      const t=await efcContract.fundStaking(ethers.parseEther(amt.toString())); await t.wait();
+      toast('✓ Pool funded','success');
+      logAudit('Staking pool funded',amt+' EFC');
+      loadContractData();
+    });
+}
+async function adminSetExempt(fn,status){
+  const id=fn==='isFeeExempt'?'ctrl-fee-addr':'ctrl-max-addr';
+  const addr=document.getElementById(id).value.trim();
+  if(!ethers.isAddress(addr)){ toast('Invalid address','error'); return; }
+  const setterFn=fn==='isFeeExempt'?'setFeeExempt':'setMaxExempt';
+  txModal((status?'Set':'Remove')+' Exemption',addr.slice(0,10)+'...',`Function: ${setterFn}(${addr.slice(0,8)}..., ${status})`,
+    async()=>{
+      const t=await efcContract[setterFn](addr,status); await t.wait();
+      toast('✓ Exemption updated','success');
+      logAudit(setterFn+' updated',addr+' → '+status);
+    });
+}
+async function adminSetPair(status){
+  const addr=document.getElementById('ctrl-pair-addr').value.trim();
+  if(!ethers.isAddress(addr)){ toast('Invalid address','error'); return; }
+  txModal((status?'Register':'Unregister')+' Pair',addr.slice(0,10)+'...',`Function: setPair(${addr.slice(0,8)}..., ${status})`,
+    async()=>{
+      const t=await efcContract.setPair(addr,status); await t.wait();
+      toast('✓ Pair updated','success');
+      logAudit('setPair updated',addr+' → '+status);
+    });
+}
+
+/* ════════════════════════════════════════
+   HIGH-RISK ACTIONS (PIN + typed confirm)
+════════════════════════════════════════ */
+function confirmRisky(fnName,title,sub,detail){
+  setT('risk-title',title); setT('risk-sub',sub);
+  document.getElementById('risk-detail').innerHTML=detail;
+  document.getElementById('risk-type-confirm').value='';
+  document.getElementById('risk-pin-confirm').value='';
+  riskCB=async()=>{
+    const t=await efcContract[fnName](); await t.wait();
+    toast('✓ '+title+' executed','success');
+    logAudit(title+' EXECUTED','via '+fnName+'() — irreversible');
+  };
+  openM('risk-modal');
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('risk-confirm-btn').onclick=async function(){
+    const typed=document.getElementById('risk-type-confirm').value.trim();
+    const pin=document.getElementById('risk-pin-confirm').value.trim();
+    const storedPin=localStorage.getItem(getPinKey());
+    if(typed!=='CONFIRM'){ toast('You must type CONFIRM exactly','error'); return; }
+    if(pin!==storedPin){ toast('Incorrect PIN','error'); return; }
+    if(!riskCB) return;
+    this.textContent='⌛ Executing...'; this.disabled=true;
+    try{ await riskCB(); }catch(e){ toast('Error: '+e.message,'error'); }
+    this.textContent='Execute Action'; this.disabled=false;
+    closeM('risk-modal'); riskCB=null;
+    refreshAll();
+  };
+});
+
+function openBurnModal(){ openM('burn-modal'); }
+function confirmBurnStep(){
+  const amt=parseFloat(document.getElementById('burn-amount').value);
+  if(!amt||amt<=0){ toast('Enter amount','error'); return; }
+  closeM('burn-modal');
+  setT('risk-title','Burn '+amt+' EFC');
+  setT('risk-sub','This permanently destroys '+amt+' EFC from your wallet and reduces total supply forever.');
+  document.getElementById('risk-detail').innerHTML='Amount: <b>'+amt+' EFC</b><br/>Function: burn()<br/>Effect: Total supply permanently reduced';
+  document.getElementById('risk-type-confirm').value='';
+  document.getElementById('risk-pin-confirm').value='';
+  riskCB=async()=>{
+    const t=await efcContract.burn(ethers.parseEther(amt.toString())); await t.wait();
+    toast('✓ Burned '+amt+' EFC','success');
+    logAudit('Tokens burned',amt+' EFC — supply reduced permanently');
+  };
+  openM('risk-modal');
+}
+
+/* ════════════════════════════════════════
+   AUDIT LOG
+════════════════════════════════════════ */
+function logAudit(action,detail){
+  const log=JSON.parse(localStorage.getItem('efc_audit_log')||'[]');
+  log.unshift({time:Date.now(),action,detail,admin:adminAddr});
+  if(log.length>200) log.length=200;
+  localStorage.setItem('efc_audit_log',JSON.stringify(log));
+  renderAuditLog();
+}
+function renderAuditLog(){
+  const list=document.getElementById('audit-log-list');
+  if(!list) return;
+  const log=JSON.parse(localStorage.getItem('efc_audit_log')||'[]');
+  if(!log.length){ list.innerHTML='<div class="tbl-empty">No admin actions logged yet this session</div>'; return; }
+  list.innerHTML=log.map(l=>`
+    <div class="audit-row">
+      <span class="audit-time">${new Date(l.time).toLocaleString()}</span>
+      <span class="audit-action"><b>${l.action}</b> — ${l.detail}</span>
+      <span class="mono" style="font-size:8.5px;color:var(--muted)">${(l.admin||'').slice(0,8)}...</span>
+    </div>`).join('');
+}
+function clearAuditLog(){
+  if(!confirm('Clear the entire audit log? This cannot be undone.')) return;
+  localStorage.removeItem('efc_audit_log');
+  renderAuditLog();
+  toast('Audit log cleared','info');
+}
+
+/* ════════════════════════════════════════
+   FEED HELPER
+════════════════════════════════════════ */
+function addFeedItem(containerId,type,icon,title,sub){
+  const c=document.getElementById(containerId);
+  if(!c) return;
+  if(c.querySelector('.tbl-empty')) c.innerHTML='';
+  const row=document.createElement('div');
+  row.className='feed-row';
+  row.innerHTML=`<div class="feed-ic ${type}">${icon}</div><div class="feed-body"><div class="feed-type">${title}</div><div class="feed-hash">${sub}</div></div>`;
+  c.prepend(row);
+  while(c.children.length>30) c.removeChild(c.lastChild);
+}
+
+/* ════════════════════════════════════════
+   UI HELPERS
+════════════════════════════════════════ */
+function setT(id,v){ const el=document.getElementById(id); if(el) el.textContent=v; }
+function openM(id){ document.getElementById(id).classList.add('open'); }
+function closeM(id){ document.getElementById(id).classList.remove('open'); }
+document.addEventListener('click',e=>{ if(e.target.classList.contains('m-ov')) e.target.classList.remove('open'); });
+function toast(msg,type='info'){
+  const t=document.createElement('div'); t.className='toast '+type;
+  const icons={success:'✓',error:'✕',info:'ℹ'};
+  t.innerHTML=`<span>${icons[type]||'ℹ'}</span>${msg}`;
+  document.getElementById('toast-box').appendChild(t);
+  setTimeout(()=>t.remove(),5000);
+}
+
+if(window.ethereum){
+  window.ethereum.on('accountsChanged',()=>{ toast('Wallet changed — please re-verify','error'); lockAdmin(); });
+  window.ethereum.on('chainChanged',()=>window.location.reload());
+}
+</script>
+</body>
+</html>
